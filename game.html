@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Madhuri & Mahesh</title>
+  <!-- Google Fonts for a decorative feel -->
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f7e6b3, #fbe8a6);
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      background-size: cover;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      border: 4px solid #b22222;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    h1, h2, h3 {
+      font-family: 'Lobster', cursive;
+      color: #b22222;
+      margin-bottom: 10px;
+    }
+    button {
+      background: linear-gradient(45deg, #ff6347, #ff4500);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      margin: 10px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(45deg, #ff4500, #ff6347);
+    }
+    .option {
+      display: block;
+      margin: 10px auto;
+      width: 80%;
+      max-width: 300px;
+      background: linear-gradient(45deg, #ff4500, #ff6347);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .option:hover {
+      transform: scale(1.05);
+      background: linear-gradient(45deg, #ff6347, #ff4500);
+    }
+    input, select {
+      padding: 10px;
+      margin: 10px;
+      width: 80%;
+      max-width: 300px;
+      border: 2px solid #b22222;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #b22222;
+    }
+    .hidden {
+      display: none;
+    }
+    #rulesContainer {
+      text-align: left;
+      margin: 20px auto;
+      max-width: 600px;
+      border: 1px dashed #b22222;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    #adminPanel {
+      margin-top: 20px;
+      padding: 15px;
+      border: 2px solid #b22222;
+      border-radius: 8px;
+      background: #fefefe;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #b22222;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Start Screen with User Details and Rules -->
+    <div id="startScreen">
+      <h1 id="startTitle"></h1>
+      <div id="rulesContainer">
+        <h3 id="rulesTitle"></h3>
+        <ul id="rulesList"></ul>
+      </div>
+      <p id="startInstruction"></p>
+      <form id="userForm">
+        <label for="userName" id="nameLabel"></label>
+        <input type="text" id="userName" required placeholder="" />
+        <label for="userRelation" id="relationLabel"></label>
+        <input type="text" id="userRelation" required placeholder="" />
+        <label for="userLanguage" id="languageLabel"></label>
+        <select id="userLanguage">
+          <option value="en">English</option>
+          <option value="hi">हिन्दी</option>
+          <option value="te">తెలుగు</option>
+        </select>
+        <br>
+        <button type="submit" id="startButton"></button>
+      </form>
+    </div>
+
+    <!-- Question Screen -->
+    <div id="questionScreen" class="hidden">
+      <h2 id="welcomeMessage"></h2>
+      <h3 id="questionText"></h3>
+      <div id="options"></div>
+      <p id="feedback" style="color: red;"></p>
+    </div>
+
+    <!-- Final Screen -->
+    <div id="finalScreen" class="hidden">
+      <h2 id="gameOverText"></h2>
+      <p id="scoreText"></p>
+      <div id="resultMessage"></div>
+      <div id="giftSuggestions"></div>
+      <button id="adminLoginBtn" onclick="adminLogin()">Admin Login</button>
+    </div>
+
+    <!-- Admin Panel (Hidden by default) -->
+    <div id="adminPanel" class="hidden">
+      <h3>Admin Panel - Game Results</h3>
+      <div id="adminContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // Translation dictionary for UI texts, rules, and messages.
+    // The startTitle is set to "Madhuri & Mahesh" in all languages.
+    const translations = {
+      en: {
+        startTitle: "Madhuri & Mahesh",
+        startInstruction: "Please enter your details before starting the game.",
+        nameLabel: "Your Name:",
+        relationLabel: "Relation to the Couple:",
+        languageLabel: "Choose Language:",
+        startButton: "Start Game",
+        rulesTitle: "Game Rules:",
+        rules: [
+          "No Google search allowed.",
+          "Do not ask elders for help until after scanning the code.",
+          "Play your own game; no cheating.",
+          "First 20 players to score 15 out of 15 will receive a surprise gift."
+        ],
+        welcome: "Welcome, {userName} ({userRelation})!",
+        correct: "Correct!",
+        wrong: "Wrong! The correct answer is {answer}.",
+        gameOver: "Game Over!",
+        score: "Your Score: {score} / 15",
+        giftCardUnlocked: "Outstanding! You are among the first 20 perfect scorers and have unlocked a special gift card!",
+        giftCardCode: "Redeem your gift card code: WEDDING2025 at checkout for an exclusive discount.",
+        giftSuggestionsTitle: "Great Effort! Here are some thoughtful gift suggestions for the couple:",
+        giftList: [
+          "Digital Art Commission inspired by Indian themes",
+          "Subscription to wellness & art classes",
+          "Charitable donation in the couple’s name",
+          "Custom animated wedding video"
+        ]
+      },
+      hi: {
+        startTitle: "Madhuri & Mahesh",
+        startInstruction: "खेल शुरू करने से पहले कृपया अपनी जानकारी दर्ज करें।",
+        nameLabel: "आपका नाम:",
+        relationLabel: "जोड़े से आपका संबंध:",
+        languageLabel: "भाषा चुनें:",
+        startButton: "खेल शुरू करें",
+        rulesTitle: "खेल के नियम:",
+        rules: [
+          "गूगल सर्च की अनुमति नहीं है।",
+          "कोड स्कैन करने से पहले बड़ों से सहायता न लें।",
+          "अपना खेल खुद खेलें; धोखाधड़ी न करें।",
+          "15 में से 15 स्कोर करने वाले पहले 20 खिलाड़ी को सरप्राइज़ उपहार मिलेगा।"
+        ],
+        welcome: "स्वागत है, {userName} ({userRelation})!",
+        correct: "सही!",
+        wrong: "गलत! सही उत्तर है {answer}.",
+        gameOver: "खेल समाप्त!",
+        score: "आपका स्कोर: {score} / 15",
+        giftCardUnlocked: "उत्कृष्ट! आप पहले 20 में से एक हैं जिन्होंने 15 में से 15 स्कोर किया और आपने विशेष गिफ्ट कार्ड अनलॉक किया है!",
+        giftCardCode: "चेकआउट पर अनन्य छूट के लिए अपना गिफ्ट कार्ड कोड: WEDDING2025 रिडीम करें।",
+        giftSuggestionsTitle: "शानदार प्रयास! यहाँ जोड़े के लिए कुछ विचारशील उपहार सुझाव दिए गए हैं:",
+        giftList: [
+          "भारतीय थीम से प्रेरित डिजिटल आर्ट कमीशन",
+          "वेलनेस और आर्ट क्लासेस की सदस्यता",
+          "जोड़े के नाम पर दान",
+          "कस्टम एनिमेटेड वेडिंग वीडियो"
+        ]
+      },
+      te: {
+        startTitle: "Madhuri & Mahesh",
+        startInstruction: "గేమ్ ప్రారంభించడానికి ముందు దయచేసి మీ వివరాలను నమోదు చేయండి.",
+        nameLabel: "మీ పేరు:",
+        relationLabel: "జంటకు మీ సంబంధం:",
+        languageLabel: "భాషను ఎంచుకోండి:",
+        startButton: "గేమ్ ప్రారంభించండి",
+        rulesTitle: "ఆట నియమాలు:",
+        rules: [
+          "గూగుల్ శోధన అనుమతించబడదు.",
+          "కోడ్ స్కాన్ చేయడానికి ముందు పెద్దల సహాయం తీసుకోవద్దు.",
+          "మీ ఆటను స్వయంగా ఆడండి; చీటింగ్ చేయొద్దు.",
+          "15 లో 15 స్కోరు సాధించిన మొదటి 20 ఆటగాళ్ళకు ఆశ్చర్యపు బహుమతి లభిస్తుంది."
+        ],
+        welcome: "స్వాగతం, {userName} ({userRelation})!",
+        correct: "సరైంది!",
+        wrong: "తప్పు! సరైన సమాధానం {answer}.",
+        gameOver: "గేమ్ ముగిసింది!",
+        score: "మీ స్కోర్: {score} / 15",
+        giftCardUnlocked: "అద్భుతం! మీరు మొదటి 20లో ఒకరుగా 15 లో 15 స్కోరు సాధించి ప్రత్యేక గిఫ్ట్ కార్డ్ పొందారు!",
+        giftCardCode: "ఒక ప్రత్యేక రాయితీ కోసం చెకౌట్ వద్ద మీ గిఫ్ట్ కార్డ్ కోడ్: WEDDING2025 ని రీడీమ్ చేయండి.",
+        giftSuggestionsTitle: "చాలా మంచి ప్రయత్నం! జంట కోసం కొన్ని ఆలోచనాత్మక గిఫ్ట్ సూచనలు ఇవే:",
+        giftList: [
+          "భారతీయ థీమ్‌ల నుండి ప్రేరణ పొందిన డిజిటల్ ఆర్ట్ కమిషన్",
+          "వెల్‌నెస్ మరియు ఆర్ట్ క్లాసులకు సభ్యత్వం",
+          "జంట పేరుతో దాతృత్వ దానం",
+          "కస్టమ్ అనిమేటెడ్ వెడ్డింగ్ వీడియో"
+        ]
+      }
+    };
+
+    // Pool of 30 localized questions covering various topics
+    const localizedQuestions = [
+      {
+        en: {
+          question: "In traditional Indian marriages, which sacred ornament is believed to embody the marital bond and spiritual connection between partners?",
+          options: ["Mangalsutra", "Ring", "Bindi", "Nose Ring"],
+          answer: "Mangalsutra"
+        },
+        hi: {
+          question: "परंपरागत भारतीय शादियों में, कौन सा पवित्र आभूषण जोड़े के बीच वैवाहिक बंधन और आध्यात्मिक संबंध को दर्शाता है?",
+          options: ["मंगलसूत्र", "रिंग", "बिंदी", "नाक की बाली"],
+          answer: "मंगलसूत्र"
+        },
+        te: {
+          question: "సాంప్రదాయ భారతీయ వివాహాల్లో, జంటల మధ్య వైవాహిక బంధం మరియు ఆధ్యాత్మిక సంబంధాన్ని సూచించే పవిత్ర అలంకారం ఏది?",
+          options: ["మంగళసూత్రం", "రింగ్", "బిండి", "నోస్ రింగ్"],
+          answer: "మంగళసూత్రం"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian scripture provides detailed prescriptions for various life rituals, including matrimonial ceremonies?",
+          options: ["Grihya Sutras", "Vedas", "Upanishads", "Mahabharata"],
+          answer: "Grihya Sutras"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय ग्रन्थ विवाह संस्कार सहित विभिन्न जीवन रस्मों के लिए विस्तृत निर्देश प्रदान करता है?",
+          options: ["गृह्य सूत्र", "वेद", "उपनिषद", "महाभारत"],
+          answer: "गृह्य सूत्र"
+        },
+        te: {
+          question: "వివాహ ఆచారాలతో పాటు వివిధ జీవిత దశల కోసం విస్తృత మార్గదర్శకాలను అందించే పురాతన భారతీయ గ్రంథం ఏది?",
+          options: ["గృహ్య సూక్తులు", "వేదాలు", "ఉపనిషత్తులు", "మహాభారతం"],
+          answer: "గృహ్య సూక్తులు"
+        }
+      },
+      {
+        en: {
+          question: "Among revered divine couples in Hindu mythology, which pair symbolizes ideal marital harmony and is frequently depicted in classical art and dance?",
+          options: ["Shiva and Parvati", "Rama and Sita", "Krishna and Radha", "Vishnu and Lakshmi"],
+          answer: "Shiva and Parvati"
+        },
+        hi: {
+          question: "हिंदू पौराणिक कथाओं में सम्मानित दिव्य जोड़ों में से, किस दम्पति को आदर्श वैवाहिक समरसता का प्रतीक माना जाता है और जिसे पारंपरिक कला तथा नृत्य में दर्शाया जाता है?",
+          options: ["शिव और पार्वती", "राम और सीता", "कृष्ण और राधा", "विष्णु और लक्ष्मी"],
+          answer: "शिव और पार्वती"
+        },
+        te: {
+          question: "హిందూ పురాణంలో గౌరవప్రదమైన దైవ జంటలలో, ఏ జంటను ఆదర్శ వైవాహిక సమతుల్యతకు సూచికగా పరిగణిస్తారు మరియు క్లాసికల్ కళ, నృత్యాలలో తరచుగా చూపిస్తారు?",
+          options: ["శివ మరియు పార్వతి", "రామ మరియు సీత", "కృష్ణ మరియు రాధ", "విష్ణు మరియు లక్ష్మీ"],
+          answer: "శివ మరియు పార్వతి"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Indian dance form, originating from ancient temple traditions, is celebrated for its intricate hand gestures and expressive storytelling?",
+          options: ["Bharatanatyam", "Kathak", "Odissi", "Manipuri"],
+          answer: "Bharatanatyam"
+        },
+        hi: {
+          question: "प्राचीन मंदिर परंपराओं से उत्पन्न, किस शास्त्रीय भारतीय नृत्य रूप को उसके जटिल हाथ के इशारे और भावपूर्ण कथानक के लिए सराहा जाता है?",
+          options: ["भरतनाट्यम", "कथक", "ओडिसी", "मणिपुरी"],
+          answer: "भरतनाट्यम"
+        },
+        te: {
+          question: "ప్రాచీన దేవాలయ సంప్రదాయాల నుండి ఉద్భవించిన, జటిలమైన చేతి భావభాష మరియు కథా విన్యాసం వల్ల ప్రఖ్యాతి పొందిన భారతీయ శాస్త్ర నృత్యం ఏది?",
+          options: ["భరతనాట్యం", "కథక్", "ఒడిస్సీ", "మణిపూరి"],
+          answer: "భరతనాట్యం"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional art form, known for its vivid colors and symbolic motifs, originated in the Mithila region and often portrays mythological narratives?",
+          options: ["Madhubani", "Warli", "Pattachitra", "Kalamkari"],
+          answer: "Madhubani"
+        },
+        hi: {
+          question: "कौन सी पारंपरिक कला शैली, जो अपने जीवंत रंगों और प्रतीकात्मक आकृतियों के लिए जानी जाती है, मिथिला क्षेत्र से उत्पन्न हुई है और पौराणिक कथाओं को दर्शाती है?",
+          options: ["मधुबनी", "वारली", "पटचित्र", "कलमकारी"],
+          answer: "मधुबनी"
+        },
+        te: {
+          question: "ఏ సంప్రదాయ కళారూపం, తన ప్రతీకాత్మక రూపాలు మరియు రంగుల వైభవంతో, మిధిలా ప్రాంతంలో ఉద్భవించి పురాణ కథనాలను ప్రతిబింబిస్తుంది?",
+          options: ["మధుబనీ", "వార్లీ", "పట్టచిత్ర", "కలంకరీ"],
+          answer: "మధుబనీ"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient civilization, renowned for its sophisticated urban planning and drainage systems, laid the groundwork for Indian culture?",
+          options: ["Indus Valley Civilization", "Vedic Civilization", "Maurya Empire", "Gupta Empire"],
+          answer: "Indus Valley Civilization"
+        },
+        hi: {
+          question: "कौन सी प्राचीन सभ्यता, अपनी उन्नत शहरी योजना और जल निकासी प्रणालियों के लिए प्रसिद्ध, भारतीय संस्कृति की नींव रखी?",
+          options: ["सिंधु घाटी सभ्यता", "वैदिक सभ्यता", "मौर्य साम्राज्य", "गुप्त साम्राज्य"],
+          answer: "सिंधु घाटी सभ्यता"
+        },
+        te: {
+          question: "ఏ పురాతన నాగరికత, తన సుదీర్ఘ నగర ప్రణాళిక మరియు డ్రెయినేజ్ వ్యవస్థలతో ప్రసిద్ధి పొందినది, భారతీయ సంస్కృతికి మౌలికస్తంభంగా నిలిచింది?",
+          options: ["సింధు లోయ నాగరికత", "వేద కాల నాగరికత", "మౌర్య సామ్రాజ్యం", "గుప్త సామ్రాజ్యం"],
+          answer: "సింధు లోయ నాగరికత"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian physician, celebrated for his detailed descriptions of surgical techniques and instruments, is often hailed as the 'Father of Surgery'?",
+          options: ["Sushruta", "Charaka", "Vagbhata", "Jivaka"],
+          answer: "Sushruta"
+        },
+        hi: {
+          question: "कौन से प्राचीन भारतीय चिकित्सक को उनके विस्तृत शल्य चिकित्सा तकनीकों और उपकरणों के वर्णन के लिए 'शल्य चिकित्सा के पिता' के रूप में सम्मानित किया जाता है?",
+          options: ["सुश्रुत", "चरक", "वाग्भट", "जीवक"],
+          answer: "सुश्रुत"
+        },
+        te: {
+          question: "ఏ పురాతన భారతీయ వైద్యుని, శస్త్రచికిత్స సాంకేతికతలు మరియు పరికరాల వివరాలతో, 'శస్త్రచికిత్స తండ్రి'గా ఘనంగా గౌరవిస్తారు?",
+          options: ["సుశ్రుత", "చరక", "వాగ్బహట", "జీవక"],
+          answer: "సుశ్రుత"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Ayurvedic text, attributed to Charaka, remains a foundational work in the study of ancient Indian medicine?",
+          options: ["Charaka Samhita", "Sushruta Samhita", "Ashtanga Hridayam", "Sharira Sthana"],
+          answer: "Charaka Samhita"
+        },
+        hi: {
+          question: "चरक के नाम से जुड़ा कौन सा पारंपरिक आयुर्वेदिक ग्रन्थ प्राचीन भारतीय चिकित्सा के अध्ययन में एक मौलिक कार्य बना हुआ है?",
+          options: ["चरक संहिता", "सुश्रुत संहिता", "अष्टांग हृदयम", "शरीर स्थान"],
+          answer: "चरक संहिता"
+        },
+        te: {
+          question: "చరకకు అనుసంధానమయిన, ప్రాచీన భారతీయ వైద్యం అధ్యయనంలో మూలస్తంభంగా నిలిచిన ఏ శాస్త్రీయ ఆయుర్వేద గ్రంథం?",
+          options: ["చరక సంహిత", "సుశ్రుత సంహిత", "అష్టాంగ హృదయం", "శరీర స్థానం"],
+          answer: "చరక సంహిత"
+        }
+      },
+      {
+        en: {
+          question: "In ancient Indian marriage ceremonies, which ritual involves the couple taking seven steps together, symbolizing their commitment and shared journey?",
+          options: ["Saptapadi", "Kanyadaan", "Vidaai", "Jaimala"],
+          answer: "Saptapadi"
+        },
+        hi: {
+          question: "प्राचीन भारतीय विवाह समारोहों में, कौन सा संस्कार दम्पति द्वारा एक साथ सात कदम उठाने को दर्शाता है, जो उनके समर्पण और साझा यात्रा का प्रतीक है?",
+          options: ["सप्तपदी", "कन्यादान", "विदाई", "जयमाला"],
+          answer: "सप्तपदी"
+        },
+        te: {
+          question: "ప్రాచీన భారతీయ వివాహోత్సవాల్లో, జంట కలిసి ఏడు అడుగులు వేయడం ద్వారా వారి కమిట్‌మెంట్ మరియు సహచర ప్రయాణాన్ని సూచించే ఆచారం ఏది?",
+          options: ["సప్తపది", "కన్యాదానం", "విడాయి", "జైమాలా"],
+          answer: "సప్తపది"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional decorative art, created using colorful powders and intricate patterns, is an integral part of Indian wedding celebrations and symbolizes the welcoming of prosperity?",
+          options: ["Rangoli", "Madhubani", "Warli", "Pattachitra"],
+          answer: "Rangoli"
+        },
+        hi: {
+          question: "कौन सी पारंपरिक सजावटी कला, जिसे रंगीन पाउडर और जटिल आकृतियों से बनाया जाता है, भारतीय शादी समारोह का एक अभिन्न हिस्सा है और समृद्धि के स्वागत का प्रतीक है?",
+          options: ["रंगोली", "मधुबनी", "वारली", "पटचित्र"],
+          answer: "रंगोली"
+        },
+        te: {
+          question: "రంగుల పొడితో, సంక్లిష్ట నమూనాలతో సృష్టించబడే, భారతీయ వివాహాలలో సమృద్ధిని ఆహ్వానించేందుకు ముఖ్యంగా చూపించే, సంప్రదాయ అలంకార కళ ఏది?",
+          options: ["రంగోలి", "మధుబనీ", "వార్లీ", "పట్టచిత్ర"],
+          answer: "రంగోలి"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient treatise, attributed to Bharata Muni, lays the foundation for classical Indian dance, drama, and music?",
+          options: ["Natyashastra", "Kamasutra", "Arthashastra", "Charaka Samhita"],
+          answer: "Natyashastra"
+        },
+        hi: {
+          question: "भरत मुनि द्वारा लिखित, शास्त्रीय भारतीय नृत्य, नाटक और संगीत की नींव रखने वाला कौन सा ग्रन्थ है?",
+          options: ["नाट्यशास्त्र", "कामसूत्र", "अर्थशास्त्र", "चरक संहिता"],
+          answer: "नाट्यशास्त्र"
+        },
+        te: {
+          question: "భరత ముని గారి రచనతో, భారతీయ శాస్త్ర నృత్యం, నాటకం, సంగీతానికి మౌలిక స్థంభంగా నిలిచిన గ్రంథం ఏది?",
+          options: ["నాట్యశాస్త్రం", "కామసూత్రం", "అర్థశాస్త్రం", "చరక సంహిత"],
+          answer: "నాట్యశాస్త్రం"
+        }
+      },
+      {
+        en: {
+          question: "Which Gupta emperor, celebrated for ushering in a golden age of art and literature, is known for his patronage of scholars and artists?",
+          options: ["Chandragupta II", "Samudragupta", "Ashoka", "Harsha"],
+          answer: "Chandragupta II"
+        },
+        hi: {
+          question: "गुप्त साम्राज्य के किस सम्राट को कला और साहित्य के स्वर्ण युग के आगमन के लिए जाना जाता है, जिन्होंने विद्वानों और कलाकारों का संरक्षण किया?",
+          options: ["चंद्रगुप्त द्वितीय", "समुद्रगुप्त", "अशोक", "हर्ष"],
+          answer: "चंद्रगुप्त द्वितीय"
+        },
+        te: {
+          question: "కళ మరియు సాహిత్య స్వర్ణ యుగాన్ని ప్రవేశపెట్టిన, विद्वానుల మరియు కళాకారుల పరిరక్షణకు ప్రసిద్ధి పొందిన గుప్త శాసకుడు ఎవరు?",
+          options: ["చంద్రగుప్త ద్వితీయ", "సముద్రగుప్త", "అశోక", "హర్ష"],
+          answer: "చంద్రగుప్త ద్వితీయ"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian mathematician is renowned for formalizing the concept of zero and significantly advancing the decimal system?",
+          options: ["Aryabhata", "Brahmagupta", "Bhaskaracharya", "Varahamihira"],
+          answer: "Brahmagupta"
+        },
+        hi: {
+          question: "कौन से प्राचीन भारतीय गणितज्ञ को शून्य की अवधारणा स्थापित करने और दशमलव प्रणाली में महत्वपूर्ण प्रगति के लिए जाना जाता है?",
+          options: ["आर्यभट्ट", "ब्रह्मगुप्त", "भास्कराचार्य", "वराहमिहिर"],
+          answer: "ब्रह्मगुप्त"
+        },
+        te: {
+          question: "ఏ పురాతన భారతీయ గణిత శాస్త్రజ్ఞుడు శూన్యం భావనను స్థిరీకరించి, దశాంశ వ్యవస్థను అభివృద్ధి చేసినవాడుగా ప్రసిద్ధి చెందాడు?",
+          options: ["ఆర్యభట్ట", "బ్రహ్మగుప్త", "భాస్కరాచార్య", "వరాహమిహిర"],
+          answer: "బ్రహ్మగుప్త"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Sanskrit play by Kalidasa is renowned for its poetic beauty and had a profound influence on Indian literature?",
+          options: ["Abhijnanasakuntalam", "Meghaduta", "Raghuvamsha", "Kumarasambhavam"],
+          answer: "Abhijnanasakuntalam"
+        },
+        hi: {
+          question: "कालिदास द्वारा लिखित कौन सा शास्त्रीय संस्कृत नाटक अपनी काव्यात्मक सुंदरता के लिए प्रसिद्ध है और भारतीय साहित्य पर गहरा प्रभाव डालता है?",
+          options: ["अभिज्ञानशकुंतलम्", "मेघदूत", "रघुवंश", "कुमारसम्भवम्"],
+          answer: "अभिज्ञानशकुंतलम्"
+        },
+        te: {
+          question: "కాలिदాస రచించిన, తన కావ్యసౌందర్యంతో ప్రసిద్ధి చెందిన మరియు భారతీయ సాహిత్యం పై గంభీర ప్రభావం చూపిన నాటకం ఏది?",
+          options: ["అభిజ్ఞానశకుంతలమ్", "మెఘదూత", "రఘువంశం", "కుమారసంభవం"],
+          answer: "అభిజ్ఞానశకుంతలమ్"
+        }
+      },
+      {
+        en: {
+          question: "Which style of Indian miniature painting is renowned for its intricate details, vibrant colors, and depiction of royal courts and mythological themes?",
+          options: ["Mughal Miniature", "Rajput Painting", "Pahari Painting", "Deccan Painting"],
+          answer: "Mughal Miniature"
+        },
+        hi: {
+          question: "भारतीय लघु चित्रकला की किस शैली को जटिल विवरण, जीवंत रंगों और शाही दरबार तथा पौराणिक विषयों के चित्रण के लिए जाना जाता है?",
+          options: ["मुगल लघु चित्रकला", "राजपूत चित्रकला", "पहाड़ी चित्रकला", "दक्कन चित्रकला"],
+          answer: "मुगल लघु चित्रकला"
+        },
+        te: {
+          question: "వివరమైన డిజైన్, ఉజ్వల రంగులు మరియు శాహిక సభల చిత్రణ కోసం ప్రసిద్ధి పొందిన భారతీయ సూక్ష్మచిత్రకళా శైలి ఏది?",
+          options: ["గుప్త శిల్పం", "ద్రవిడ శిల్పం", "సింధు శిల్పం", "వేద శిల్పం"],
+          answer: "ద్రవిడ శిల్పం"
+        }
+      },
+      {
+        en: {
+          question: "Which classical dance form from Kerala is known for its elaborate makeup, costumes, and storytelling through facial expressions?",
+          options: ["Kathakali", "Mohiniyattam", "Bharatanatyam", "Odissi"],
+          answer: "Kathakali"
+        },
+        hi: {
+          question: "केरल की किस शास्त्रीय नृत्य शैली को उसके विस्तृत मेकअप, पोशाक और भावभंगिमाओं द्वारा कहानी कहने के लिए जाना जाता है?",
+          options: ["कथकली", "मोहिनीअट्टम", "भरतनाट्यम", "ओडिसी"],
+          answer: "कथकली"
+        },
+        te: {
+          question: "కేరళ నుండి వచ్చిన, విస్తృతమైన మేకప్, దుస్తులు మరియు ముఖ భావాల ద్వారా కథ చెప్పే నృత్య రూపం ఏది?",
+          options: ["కథకళి", "మోహినియట్టం", "భరతనాట్యం", "ఒడిస్సీ"],
+          answer: "కథకళి"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian dynasty is renowned for its contributions to architecture, including the construction of grand temples and intricate stone carvings?",
+          options: ["Chola Dynasty", "Maurya Dynasty", "Gupta Dynasty", "Mughal Dynasty"],
+          answer: "Chola Dynasty"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय वंश भव्य मंदिरों और जटिल पत्थर की नक्काशी के निर्माण के लिए जाना जाता है?",
+          options: ["चोल वंश", "मौर्य वंश", "गुप्त वंश", "मुगल वंश"],
+          answer: "चोल वंश"
+        },
+        te: {
+          question: "ఏ ప్రాచీన భారతీయ వంశం భవ్య దేవాలయ నిర్మాణం మరియు సంక్లిష్ట రాళ్ళ నక్కాశీకి ప్రసిద్ధి చెందింది?",
+          options: ["చోల వంశం", "మౌర్య వంశం", "గుప్త వంశం", "ముగల్ వంశం"],
+          answer: "చోల వంశం"
+        }
+      },
+      {
+        en: {
+          question: "Which monument, built during the Mughal era, is revered as a symbol of eternal love?",
+          options: ["Taj Mahal", "Red Fort", "Humayun's Tomb", "Qutub Minar"],
+          answer: "Taj Mahal"
+        },
+        hi: {
+          question: "मुगल काल में निर्मित, किस स्मारक को अनंत प्रेम का प्रतीक माना जाता है?",
+          options: ["ताज महल", "लाल किला", "हुमायूँ का मकबरा", "कुतुब मीनार"],
+          answer: "ताज महल"
+        },
+        te: {
+          question: "ముగల్ యుగంలో నిర్మించిన, శాశ్వత ప్రేమకు సంకేతంగా భావించబడే శిల్పస్మారకం ఏది?",
+          options: ["తాజ్ మహల్", "లాల్ ఫోర్ట్", "హుమాయున్ టాంబ్", "క్టుబ్ మీనార్"],
+          answer: "తాజ్ మహల్"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Indian textile art, known for its tie-dye techniques, originates from the western region of India?",
+          options: ["Bandhani", "Kalamkari", "Ajrakh", "Phulkari"],
+          answer: "Bandhani"
+        },
+        hi: {
+          question: "कौन सी पारंपरिक भारतीय वस्त्र कला, जो टाई-डाई तकनीक के लिए जानी जाती है, पश्चिमी भारत से उत्पन्न हुई है?",
+          options: ["बांधनी", "कलमकारी", "अजरख", "फुलकारी"],
+          answer: "बांधनी"
+        },
+        te: {
+          question: "పశ్చిమ భారతదేశం నుండి ఉద్భవించిన, టై-డై సాంకేతికతకు ప్రఖ్యాత సంప్రదాయ వస్త్ర కళ ఏది?",
+          options: ["బంధని", "కలమకరీ", "అజ్రఖ్", "ఫుల్కారి"],
+          answer: "బంధని"
+        }
+      },
+      {
+        en: {
+          question: "Which energetic folk dance, originating from Punjab, is traditionally performed during the harvest season?",
+          options: ["Bhangra", "Garba", "Dandiya", "Bihu"],
+          answer: "Bhangra"
+        },
+        hi: {
+          question: "पंजाब से उत्पन्न, किस ऊर्जावान लोक नृत्य को पारंपरिक रूप से कटाई के मौसम में प्रस्तुत किया जाता है?",
+          options: ["भांगड़ा", "गरबा", "डांडिया", "बिहू"],
+          answer: "भांगड़ा"
+        },
+        te: {
+          question: "పంజాబ్ నుండి ఉద్భవించిన, పంట తీల్చే కాలంలో సంప్రదాయంగా ప్రదర్శించబడే ఉత్తేజకరమైన జానపద నృత్యం ఏది?",
+          options: ["భాంగ్రా", "గర్బా", "డండియా", "బిహూ"],
+          answer: "భాంగ్రా"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian empire, with its capital at Pataliputra and famed for the teachings of Emperor Ashoka, laid the foundations for a centralized state?",
+          options: ["Maurya Empire", "Gupta Empire", "Chola Dynasty", "Mughal Empire"],
+          answer: "Maurya Empire"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय साम्राज्य, जिसकी राजधानी पाटलिपुत्र थी और जिसे सम्राट अशोक की शिक्षाओं के लिए जाना जाता है, एक केंद्रीकृत राज्य की नींव रखता है?",
+          options: ["मौर्य साम्राज्य", "गुप्त साम्राज्य", "चोल वंश", "मुगल साम्राज्य"],
+          answer: "मौर्य साम्राज्य"
+        },
+        te: {
+          question: "పాటాలిపుత్రంలో రాజధాని ఉన్న, సమ్రాట అశోక యొక్క బోధనలతో ప్రసిద్ధి పొందిన, కేంద్రబద్ధమైన రాష్ట్ర వ్యవస్థకు పునాది వేసిన ఏ పురాతన భారతీయ సామ్రాజ్యం?",
+          options: ["మౌర్య సామ్రాజ్యం", "గుప్త సామ్రాజ్యం", "చోల వంశం", "ముగల్ సామ్రాజ్యం"],
+          answer: "మౌర్య సామ్రాజ్యం"
+        }
+      },
+      {
+        en: {
+          question: "Which ritual in ancient Indian weddings involves the exchange of floral garlands between the bride and groom?",
+          options: ["Jaimala", "Saptapadi", "Kanyadaan", "Mangalsutra"],
+          answer: "Jaimala"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दूल्हा-दुल्हन द्वारा पुष्पमाला के आदान-प्रदान को कौन सा संस्कार कहा जाता है?",
+          options: ["जयमाला", "सप्तपदी", "कन्यादान", "मंगलसूत्र"],
+          answer: "जयमाला"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన-దూల్హను మధ్య పుష్పాల మార్పిడిని ఏ ఆచారం అంటారు?",
+          options: ["జైమాలా", "సప్తపది", "కన్యాదానం", "మంగళసూత్రం"],
+          answer: "జైమాలా"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Ayurvedic text is renowned for its holistic approach, combining herbal remedies with lifestyle and diet recommendations?",
+          options: ["Ashtanga Hridayam", "Charaka Samhita", "Sushruta Samhita", "Sharira Sthana"],
+          answer: "Ashtanga Hridayam"
+        },
+        hi: {
+          question: "कौन सा शास्त्रीय आयुर्वेदिक ग्रन्थ अपनी समग्र पद्धति के लिए प्रसिद्ध है, जो जड़ी-बूटियों के उपचार के साथ जीवनशैली और आहार संबंधी सिफारिशों को भी सम्मिलित करता है?",
+          options: ["अष्टांग हृदयम", "चरक संहिता", "सुश्रुत संहिता", "शरीर स्थान"],
+          answer: "अष्टांग हृदयम"
+        },
+        te: {
+          question: "జడి-బూటీలు, జీవనశైలి మరియు ఆహార సిఫారసులతో కూడిన సమగ్ర ఆరోగ్య పరిరక్షణకు సంబంధించిన ఏ శాస్త్రీయ ఆయుర్వేద గ్రంథం ప్రసిద్ధి చెందింది?",
+          options: ["అష్టాంగ హృదయం", "చరక సంహిత", "సుశ్రుత సంహిత", "శరీర స్థానం"],
+          answer: "అష్టాంగ హృదయం"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian scholar is known for his work 'Arthashastra', a treatise on statecraft, economic policy, and military strategy?",
+          options: ["Chanakya", "Kalidasa", "Panini", "Varahamihira"],
+          answer: "Chanakya"
+        },
+        hi: {
+          question: "कौन से प्राचीन भारतीय विद्वान को 'अर्थशास्त्र' लिखने के लिए जाना जाता है, जो राज्य कला, आर्थिक नीति और सैन्य रणनीति पर एक ग्रन्थ है?",
+          options: ["चाणक्य", "कालिदास", "पाणिनि", "वराहमिहिर"],
+          answer: "चाणक्य"
+        },
+        te: {
+          question: "రాజ్యనీతిని, ఆర్ధిక విధానాన్ని మరియు సైనిక వ్యూహాన్ని గురించి వివరించే 'అర్థశాస్త్రం' రచించిన పురాతన భారతీయ పండితుడు ఎవరు?",
+          options: ["చాణక్య", "కాలిదాస", "పాణిని", "వరాహమిహిర"],
+          answer: "చాణక్య"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Indian ritual involves the bride's feet being adorned with intricate henna designs?",
+          options: ["Mehendi", "Sindoor", "Mangalsutra", "Bindi"],
+          answer: "Mehendi"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दुल्हन के पैरों को जटिल मेंहदी डिजाइनों से सजाने वाली कौन सी रस्म शामिल होती है?",
+          options: ["मेंहदी", "सिंदूर", "मंगलसूत्र", "बिंदी"],
+          answer: "मेंहदी"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన్ పాదాలను సంక్లిష్టమైన మెహందీ డిజైన్లతో అలంకరించే ఆచారం ఏది?",
+          options: ["మెహందీ", "సిందూర్", "మంగళసూత్రం", "బిండి"],
+          answer: "మెహందీ"
+        }
+      },
+      {
+        en: {
+          question: "Which classical dance form from Odisha is known for its fluid movements and expressive gestures?",
+          options: ["Odissi", "Kathak", "Bharatanatyam", "Manipuri"],
+          answer: "Odissi"
+        },
+        hi: {
+          question: "ओडिशा राज्य से उत्पन्न, किस शास्त्रीय नृत्य रूप को इसकी लचीली गतियों और भावपूर्ण इशारों के लिए जाना जाता है?",
+          options: ["ओडिसी", "कथक", "भरतनाट्यम", "मणिपुरी"],
+          answer: "ओडिसी"
+        },
+        te: {
+          question: "ఒడిశా రాష్ట్రం నుండి ఉద్భవించిన, దాని సడలిన కదలికలు మరియు వ్యక్తీకరణాత్మక భావజాలాల కోసం ప్రసిద్ధి చెందిన నృత్య రూపం ఏది?",
+          options: ["ఒడిస్సీ", "కథక్", "భరతనాట్యం", "మణిపూరి"],
+          answer: "ఒడిస్సీ"
+        }
+      },
+      {
+        en: {
+          question: "Which style of Indian mural painting, often seen in Buddhist monasteries, is celebrated for its vivid storytelling and spiritual themes?",
+          options: ["Ajanta Caves Painting", "Rajasthani Fresco", "Mughal Miniature", "Dravidian Mural"],
+          answer: "Ajanta Caves Painting"
+        },
+        hi: {
+          question: "कौन सी भारतीय भित्ति चित्रकला शैली, जिसे बौद्ध मठों में देखा जाता है, अपनी जीवंत कथा और आध्यात्मिक विषयों के लिए प्रसिद्ध है?",
+          options: ["अजन्ता गुफा चित्रकला", "राजस्थानी फ्रेश्को", "मुगल लघु चित्रकला", "द्रविड़ भित्ति चित्र"],
+          answer: "अजन्ता गुफा चित्रकला"
+        },
+        te: {
+          question: "బౌద్ధ మఠాల్లో కనిపించే, తన ఉజ్వల కథా విశేషాలతో మరియు ఆధ్యాత్మిక అంశాలతో ప్రసిద్ధి పొందిన ఏ భారతీయ గోడపటం శైలి?",
+          options: ["అజంటా గుహల పెయింటింగ్", "రాజస్థానీ ఫ్రెస్కో", "ముగల్ సూక్ష్మచిత్రం", "ద్రవిడ మురల్"],
+          answer: "అజంటా గుహల పెయింటింగ్"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Sanskrit play by Kalidasa is renowned for its poetic beauty and had a profound influence on Indian literature?",
+          options: ["Abhijnanasakuntalam", "Meghaduta", "Raghuvamsha", "Kumarasambhavam"],
+          answer: "Abhijnanasakuntalam"
+        },
+        hi: {
+          question: "कालिदास द्वारा लिखित कौन सा शास्त्रीय संस्कृत नाटक अपनी काव्यात्मक सुंदरता के लिए प्रसिद्ध है और भारतीय साहित्य पर गहरा प्रभाव डालता है?",
+          options: ["अभिज्ञानशकुंतलम्", "मेघदूत", "रघुवंश", "कुमारसम्भवम्"],
+          answer: "अभिज्ञानशकुंतलम्"
+        },
+        te: {
+          question: "కాలిదాస రచించిన, తన కావ్యసౌందర్యంతో ప్రసిద్ధి చెందిన మరియు భారతీయ సాహిత్యంపై గంభీర ప్రభావం చూపిన నాటకం ఏది?",
+          options: ["అభిజ్ఞానశకుంతలమ్", "మెఘదూత", "రఘువంశం", "కుమారసంభవం"],
+          answer: "అభిజ్ఞానశకుంతలమ్"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Rajasthani folk dance is famous for its swirling movements and vibrant costumes?",
+          options: ["Ghoomar", "Kalbeliya", "Bhangra", "Garba"],
+          answer: "Ghoomar"
+        },
+        hi: {
+          question: "राजस्थान के किस पारंपरिक लोक नृत्य को इसके घूमते हुए कदमों और रंगीन पोशाकों के लिए जाना जाता है?",
+          options: ["घूमर", "कालबेलिया", "भांगड़ा", "गरबा"],
+          answer: "घूमर"
+        },
+        te: {
+          question: "రాజస్థాన్‌కు చెందిన, రంగుల వేషధారణతో మరియు తిలకుల కదలికలతో ప్రసిద్ధి పొందిన ఏ సంప్రదాయ జానపద నృత్యం?",
+          options: ["ఘూమార్", "కాల్బేలియా", "భాంగ్రా", "గర్బా"],
+          answer: "ఘూమార్"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian empire, with its capital at Pataliputra and famed for the teachings of Emperor Ashoka, laid the foundations for a centralized state?",
+          options: ["Maurya Empire", "Gupta Empire", "Chola Dynasty", "Mughal Empire"],
+          answer: "Maurya Empire"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय साम्राज्य, जिसकी राजधानी पाटलिपुत्र थी और जिसे सम्राट अशोक की शिक्षाओं के लिए जाना जाता है, एक केंद्रीकृत राज्य की नींव रखता है?",
+          options: ["मौर्य साम्राज्य", "गुप्त साम्राज्य", "चोल वंश", "मुगल साम्राज्य"],
+          answer: "मौर्य साम्राज्य"
+        },
+        te: {
+          question: "పాటాలిపుత్రంలో రాజధాని ఉన్న, సమ్రాట అశోక యొక్క బోధనలతో ప్రసిద్ధి పొందిన, కేంద్రబద్ధమైన రాష్ట్ర వ్యవస్థకు పునాది వేసిన ఏ పురాతన భారతీయ సామ్రాజ్యం?",
+          options: ["మౌర్య సామ్రాజ్యం", "గుప్త సామ్రాజ్యం", "చోల వంశం", "ముగల్ సామ్రాజ్యం"],
+          answer: "మౌర్య సామ్రాజ్యం"
+        }
+      },
+      {
+        en: {
+          question: "Which ritual in ancient Indian weddings involves the exchange of floral garlands between the bride and groom?",
+          options: ["Jaimala", "Saptapadi", "Kanyadaan", "Mangalsutra"],
+          answer: "Jaimala"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दूल्हा-दुल्हन द्वारा पुष्पमाला के आदान-प्रदान को कौन सा संस्कार कहा जाता है?",
+          options: ["जयमाला", "सप्तपदी", "कन्यादान", "मंगलसूत्र"],
+          answer: "जयमाला"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన-దూల్హను మధ్య పుష్పాల మార్పిడిని ఏ ఆచారం అంటారు?",
+          options: ["జైమాలా", "సప్తపది", "కన్యాదానం", "మంగళసూత్రం"],
+          answer: "జైమాలా"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Ayurvedic text is renowned for its holistic approach, combining herbal remedies with lifestyle and diet recommendations?",
+          options: ["Ashtanga Hridayam", "Charaka Samhita", "Sushruta Samhita", "Sharira Sthana"],
+          answer: "Ashtanga Hridayam"
+        },
+        hi: {
+          question: "कौन सा शास्त्रीय आयुर्वेदिक ग्रन्थ अपनी समग्र पद्धति के लिए प्रसिद्ध है, जो जड़ी-बूटियों के उपचार के साथ जीवनशैली और आहार संबंधी सिफारिशों को भी सम्मिलित करता है?",
+          options: ["अष्टांग हृदयम", "चरक संहिता", "सुश्रुत संहिता", "शरीर स्थान"],
+          answer: "अष्टांग हृदयम"
+        },
+        te: {
+          question: "జడిబూటీలు, జీవనశైలి మరియు ఆహార సిఫారసులతో కూడిన సమగ్ర ఆరోగ్య పరిరక్షణకు సంబంధించిన ఏ శాస్త్రీయ ఆయుర్వేద గ్రంథం ప్రసిద్ధి చెందింది?",
+          options: ["అష్టాంగ హృదయం", "చరక సంహిత", "సుశ్రుత సంహిత", "శరీర స్థానం"],
+          answer: "అష్టాంగ హృదయం"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian scholar is known for his work 'Arthashastra', a treatise on statecraft, economic policy, and military strategy?",
+          options: ["Chanakya", "Kalidasa", "Panini", "Varahamihira"],
+          answer: "Chanakya"
+        },
+        hi: {
+          question: "कौन से प्राचीन भारतीय विद्वान को 'अर्थशास्त्र' लिखने के लिए जाना जाता है, जो राज्य कला, आर्थिक नीति और सैन्य रणनीति पर एक ग्रन्थ है?",
+          options: ["चाणक्य", "कालिदास", "पाणिनि", "वराहमिहिर"],
+          answer: "चाणक्य"
+        },
+        te: {
+          question: "రాజ్యనీతిని, ఆర్ధిక విధానాన్ని మరియు సైనిక వ్యూహాన్ని గురించి వివరించే 'అర్థశాస్త్రం' రచించిన పురాతన భారతీయ పండితుడు ఎవరు?",
+          options: ["చాణక్య", "కాలిదాస", "పాణిని", "వరాహమిహిర"],
+          answer: "చాణక్య"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Indian ritual involves the bride's feet being adorned with intricate henna designs?",
+          options: ["Mehendi", "Sindoor", "Mangalsutra", "Bindi"],
+          answer: "Mehendi"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दुल्हन के पैरों को जटिल मेंहदी डिजाइनों से सजाने वाली कौन सी रस्म शामिल होती है?",
+          options: ["मेंहदी", "सिंदूर", "मंगलसूत्र", "बिंदी"],
+          answer: "मेंहदी"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన్ పాదాలను సంక్లిష్టమైన మెహందీ డిజైన్లతో అలంకరించే ఆచారం ఏది?",
+          options: ["మెహందీ", "సిందూర్", "మంగళసూత్రం", "బిండి"],
+          answer: "మెహందీ"
+        }
+      },
+      {
+        en: {
+          question: "Which classical dance form from Odisha is known for its fluid movements and expressive gestures?",
+          options: ["Odissi", "Kathak", "Bharatanatyam", "Manipuri"],
+          answer: "Odissi"
+        },
+        hi: {
+          question: "ओडिशा राज्य से उत्पन्न, किस शास्त्रीय नृत्य रूप को इसकी लचीली गतियों और भावपूर्ण इशारों के लिए जाना जाता है?",
+          options: ["ओडिसी", "कथक", "भरतनाट्यम", "मणिपुरी"],
+          answer: "ओडिसी"
+        },
+        te: {
+          question: "ఒడిశా రాష్ట్రం నుండి ఉద్భవించిన, దాని సడలిన కదలికలు మరియు వ్యక్తీకరణాత్మక భావజాలాల కోసం ప్రసిద్ధి చెందిన నృత్య రూపం ఏది?",
+          options: ["ఒడిస్సీ", "కథక్", "భరతనాట్యం", "మణిపూరి"],
+          answer: "ఒడిస్సీ"
+        }
+      },
+      {
+        en: {
+          question: "Which style of Indian mural painting, often seen in Buddhist monasteries, is celebrated for its vivid storytelling and spiritual themes?",
+          options: ["Ajanta Caves Painting", "Rajasthani Fresco", "Mughal Miniature", "Dravidian Mural"],
+          answer: "Ajanta Caves Painting"
+        },
+        hi: {
+          question: "कौन सी भारतीय भित्ति चित्रकला शैली, जिसे बौद्ध मठों में देखा जाता है, अपनी जीवंत कथा और आध्यात्मिक विषयों के लिए प्रसिद्ध है?",
+          options: ["अजन्ता गुफा चित्रकला", "राजस्थानी फ्रेश्को", "मुगल लघु चित्रकला", "द्रविड़ भित्ति चित्र"],
+          answer: "अजन्ता गुफा चित्रकला"
+        },
+        te: {
+          question: "బౌద్ధ మఠాల్లో కనిపించే, తన ఉజ్వల కథా విశేషాలతో మరియు ఆధ్యాత్మిక అంశాలతో ప్రసిద్ధి పొందిన ఏ భారతీయ గోడపటం శైలి?",
+          options: ["అజంటా గుహల పెయింటింగ్", "రాజస్థానీ ఫ్రెస్కో", "ముగల్ సూక్ష్మచిత్రం", "ద్రవిడ మురల్"],
+          answer: "అజంటా గుహల పెయింటింగ్"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Sanskrit play by Kalidasa is renowned for its poetic beauty and had a profound influence on Indian literature?",
+          options: ["Abhijnanasakuntalam", "Meghaduta", "Raghuvamsha", "Kumarasambhavam"],
+          answer: "Abhijnanasakuntalam"
+        },
+        hi: {
+          question: "कालिदास द्वारा लिखित कौन सा शास्त्रीय संस्कृत नाटक अपनी काव्यात्मक सुंदरता के लिए प्रसिद्ध है और भारतीय साहित्य पर गहरा प्रभाव डालता है?",
+          options: ["अभिज्ञानशकुंतलम्", "मेघदूत", "रघुवंश", "कुमारसम्भवम्"],
+          answer: "अभिज्ञानशकुंतलम्"
+        },
+        te: {
+          question: "కాలిదాస రచించిన, తన కావ్యసౌందర్యంతో ప్రసిద్ధి చెందిన మరియు భారతీయ సాహిత్యంపై గంభీర ప్రభావం చూపిన నాటకం ఏది?",
+          options: ["అభిజ్ఞానశకుంతలమ్", "మెఘదూత", "రఘువంశం", "కుమారసంభవం"],
+          answer: "అభిజ్ఞానశకుంతలమ్"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Rajasthani folk dance is famous for its swirling movements and vibrant costumes?",
+          options: ["Ghoomar", "Kalbeliya", "Bhangra", "Garba"],
+          answer: "Ghoomar"
+        },
+        hi: {
+          question: "राजस्थान के किस पारंपरिक लोक नृत्य को इसके घूमते हुए कदमों और रंगीन पोशाकों के लिए जाना जाता है?",
+          options: ["घूमर", "कालबेलिया", "भांगड़ा", "गरबा"],
+          answer: "घूमर"
+        },
+        te: {
+          question: "రాజస్థాన్‌కు చెందిన, రంగుల వేషధారణతో మరియు తిలకుల కదలికలతో ప్రసిద్ధి పొందిన ఏ సంప్రదాయ జానపద నృత్యం?",
+          options: ["ఘూమార్", "కాల్బేలియా", "భాంగ్రా", "గర్బా"],
+          answer: "ఘూమార్"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian empire, with its capital at Pataliputra and famed for the teachings of Emperor Ashoka, laid the foundations for a centralized state?",
+          options: ["Maurya Empire", "Gupta Empire", "Chola Dynasty", "Mughal Empire"],
+          answer: "Maurya Empire"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय साम्राज्य, जिसकी राजधानी पाटलिपुत्र थी और जिसे सम्राट अशोक की शिक्षाओं के लिए जाना जाता है, एक केंद्रीकृत राज्य की नींव रखता है?",
+          options: ["मौर्य साम्राज्य", "गुप्त साम्राज्य", "चोल वंश", "मुगल साम्राज्य"],
+          answer: "मौर्य Empire"
+        },
+        te: {
+          question: "పాటాలిపుత్రంలో రాజధాని ఉన్న, సమ్రాట అశోక యొక్క బోధనలతో ప్రసిద్ధి పొందిన, కేంద్రబద్ధమైన రాష్ట్ర వ్యవస్థకు పునాది వేసిన ఏ పురాతన భారతీయ సామ్రాజ్యం?",
+          options: ["మౌర్య సామ్రాజ్యం", "గుప్త సామ్రాజ్యం", "చోల వంశం", "ముగల్ సామ్రాజ్యం"],
+          answer: "మౌర్య సామ్రాజ్యం"
+        }
+      },
+      {
+        en: {
+          question: "Which ritual in ancient Indian weddings involves the exchange of floral garlands between the bride and groom?",
+          options: ["Jaimala", "Saptapadi", "Kanyadaan", "Mangalsutra"],
+          answer: "Jaimala"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दूल्हा-दुल्हन द्वारा पुष्पमाला के आदान-प्रदान को कौन सा संस्कार कहा जाता है?",
+          options: ["जयमाला", "सप्तपदी", "कन्यादान", "मंगलसूत्र"],
+          answer: "जयमाला"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన-దూల్హను మధ్య పుష్పాల మార్పిడిని ఏ ఆచారం అంటారు?",
+          options: ["జైమాలా", "సప్తపది", "కన్యాదానం", "మంగళసూత్రం"],
+          answer: "జైమాలా"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Ayurvedic text is renowned for its holistic approach, combining herbal remedies with lifestyle and diet recommendations?",
+          options: ["Ashtanga Hridayam", "Charaka Samhita", "Sushruta Samhita", "Sharira Sthana"],
+          answer: "Ashtanga Hridayam"
+        },
+        hi: {
+          question: "कौन सा शास्त्रीय आयुर्वेदिक ग्रन्थ अपनी समग्र पद्धति के लिए प्रसिद्ध है, जो जड़ी-बूटियों के उपचार के साथ जीवनशैली और आहार संबंधी सिफारिशों को भी सम्मिलित करता है?",
+          options: ["अष्टांग हृदयम", "चरक संहिता", "सुश्रुत संहिता", "शरीर स्थान"],
+          answer: "अष्टांग हृदयम"
+        },
+        te: {
+          question: "జడిబూటీలు, జీవనశైలి మరియు ఆహార సిఫారసులతో కూడిన సమగ్ర ఆరోగ్య పరిరక్షణకు సంబంధించిన ఏ శాస్త్రీయ ఆయుర్వేద గ్రంథం ప్రసిద్ధి చెందింది?",
+          options: ["అష్టాంగ హృదయం", "చరక సంహిత", "సుశ్రుత సంహిత", "శరీర స్థానం"],
+          answer: "అష్టాంగ హృదయం"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian scholar is known for his work 'Arthashastra', a treatise on statecraft, economic policy, and military strategy?",
+          options: ["Chanakya", "Kalidasa", "Panini", "Varahamihira"],
+          answer: "Chanakya"
+        },
+        hi: {
+          question: "कौन से प्राचीन भारतीय विद्वान को 'अर्थशास्त्र' लिखने के लिए जाना जाता है, जो राज्य कला, आर्थिक नीति और सैन्य रणनीति पर एक ग्रन्थ है?",
+          options: ["चाणक्य", "कालिदास", "पाणिनि", "वराहमिहिर"],
+          answer: "चाणक्य"
+        },
+        te: {
+          question: "రాజ్యనీతిని, ఆర్ధిక విధానాన్ని మరియు సైనిక వ్యూహాన్ని గురించి వివరించే 'అర్థశాస్త్రం' రచించిన పురాతన భారతీయ పండితుడు ఎవరు?",
+          options: ["చాణక్య", "కాలిదాస", "పాణిని", "వరాహమిహిర"],
+          answer: "చాణక్య"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Indian ritual involves the bride's feet being adorned with intricate henna designs?",
+          options: ["Mehendi", "Sindoor", "Mangalsutra", "Bindi"],
+          answer: "Mehendi"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दुल्हन के पैरों को जटिल मेंहदी डिजाइनों से सजाने वाली कौन सी रस्म शामिल होती है?",
+          options: ["मेंहदी", "सिंदूर", "मंगलसूत्र", "बिंदी"],
+          answer: "मेंहदी"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన్ పాదాలను సంక్లిష్టమైన మెహందీ డిజైన్లతో అలంకరించే ఆచారం ఏది?",
+          options: ["మెహందీ", "సిందూర్", "మంగళసూత్రం", "బిండి"],
+          answer: "మెహందీ"
+        }
+      },
+      {
+        en: {
+          question: "Which classical dance form from Odisha is known for its fluid movements and expressive gestures?",
+          options: ["Odissi", "Kathak", "Bharatanatyam", "Manipuri"],
+          answer: "Odissi"
+        },
+        hi: {
+          question: "ओडिशा राज्य से उत्पन्न, किस शास्त्रीय नृत्य रूप को इसकी लचीली गतियों और भावपूर्ण इशारों के लिए जाना जाता है?",
+          options: ["ओडिसी", "कथक", "भरतनाट्यम", "मणिपुरी"],
+          answer: "ओडिसी"
+        },
+        te: {
+          question: "ఒడిశా రాష్ట్రం నుండి ఉద్భవించిన, దాని సడలిన కదలికలు మరియు వ్యక్తీకరణాత్మక భావజాలాల కోసం ప్రసిద్ధి చెందిన నృత్య రూపం ఏది?",
+          options: ["ఒడిస్సీ", "కథక్", "భరతనాట్యం", "మణిపూరి"],
+          answer: "ఒడిస్సీ"
+        }
+      },
+      {
+        en: {
+          question: "Which style of Indian mural painting, often seen in Buddhist monasteries, is celebrated for its vivid storytelling and spiritual themes?",
+          options: ["Ajanta Caves Painting", "Rajasthani Fresco", "Mughal Miniature", "Dravidian Mural"],
+          answer: "Ajanta Caves Painting"
+        },
+        hi: {
+          question: "कौन सी भारतीय भित्ति चित्रकला शैली, जिसे बौद्ध मठों में देखा जाता है, अपनी जीवंत कथा और आध्यात्मिक विषयों के लिए प्रसिद्ध है?",
+          options: ["अजन्ता गुफा चित्रकला", "राजस्थानी फ्रेश्को", "मुगल लघु चित्रकला", "द्रविड़ भित्ति चित्र"],
+          answer: "अजन्ता गुफा चित्रकला"
+        },
+        te: {
+          question: "బౌద్ధ మఠాల్లో కనిపించే, తన ఉజ్వల కథా విశేషాలతో మరియు ఆధ్యాత్మిక అంశాలతో ప్రసిద్ధి పొందిన ఏ భారతీయ గోడపటం శైలి?",
+          options: ["అజంటా గుహల పెయింటింగ్", "రాజస్థానీ ఫ్రెస్కో", "ముగల్ సూక్ష్మచిత్రం", "ద్రవిడ మురల్"],
+          answer: "అజంటా గుహల పెయింటింగ్"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Sanskrit play by Kalidasa is renowned for its poetic beauty and had a profound influence on Indian literature?",
+          options: ["Abhijnanasakuntalam", "Meghaduta", "Raghuvamsha", "Kumarasambhavam"],
+          answer: "Abhijnanasakuntalam"
+        },
+        hi: {
+          question: "कालिदास द्वारा लिखित कौन सा शास्त्रीय संस्कृत नाटक अपनी काव्यात्मक सुंदरता के लिए प्रसिद्ध है और भारतीय साहित्य पर गहरा प्रभाव डालता है?",
+          options: ["अभिज्ञानशकुंतलम्", "मेघदूत", "रघुवंश", "कुमारसम्भवम्"],
+          answer: "अभिज्ञानशकुंतलम्"
+        },
+        te: {
+          question: "కాలిదాస రచించిన, తన కావ్యసౌందర్యంతో ప్రసిద్ధి చెందిన మరియు భారతీయ సాహిత్యంపై గంభీర ప్రభావం చూపిన నాటకం ఏది?",
+          options: ["అభిజ్ఞానశకుంతలమ్", "మెఘదూత", "రఘువంశం", "కుమారసంభవం"],
+          answer: "అభిజ్ఞానశకుంతలమ్"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Rajasthani folk dance is famous for its swirling movements and vibrant costumes?",
+          options: ["Ghoomar", "Kalbeliya", "Bhangra", "Garba"],
+          answer: "Ghoomar"
+        },
+        hi: {
+          question: "राजस्थान के किस पारंपरिक लोक नृत्य को इसके घूमते हुए कदमों और रंगीन पोशाकों के लिए जाना जाता है?",
+          options: ["घूमर", "कालबेलिया", "भांगड़ा", "गरबा"],
+          answer: "घूमर"
+        },
+        te: {
+          question: "రాజస్థాన్‌కు చెందిన, రంగుల వేషధారణతో మరియు తిలకుల కదలికలతో ప్రసిద్ధి పొందిన ఏ సంప్రదాయ జానపద నృత్యం?",
+          options: ["ఘూమార్", "కాల్బేలియా", "భాంగ్రా", "గర్బా"],
+          answer: "ఘూమార్"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian empire, with its capital at Pataliputra and famed for the teachings of Emperor Ashoka, laid the foundations for a centralized state?",
+          options: ["Maurya Empire", "Gupta Empire", "Chola Dynasty", "Mughal Empire"],
+          answer: "Maurya Empire"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय साम्राज्य, जिसकी राजधानी पाटलिपुत्र थी और जिसे सम्राट अशोक की शिक्षाओं के लिए जाना जाता है, एक केंद्रीकृत राज्य की नींव रखता है?",
+          options: ["मौर्य साम्राज्य", "गुप्त साम्राज्य", "चोल वंश", "मुगल साम्राज्य"],
+          answer: "मौर्य Empire"
+        },
+        te: {
+          question: "పాటాలిపుత్రంలో రాజధాని ఉన్న, సమ్రాట అశోక యొక్క బోధనలతో ప్రసిద్ధి పొందిన, కేంద్రబద్ధమైన రాష్ట్ర వ్యవస్థకు పునాది వేసిన ఏ పురాతన భారతీయ సామ్రాజ్యం?",
+          options: ["మౌర్య సామ్రాజ్యం", "గుప్త సామ్రాజ్యం", "చోల వంశం", "ముగల్ సామ్రాజ్యం"],
+          answer: "మౌర్య సామ్రాజ్యం"
+        }
+      },
+      {
+        en: {
+          question: "Which ritual in ancient Indian weddings involves the exchange of floral garlands between the bride and groom?",
+          options: ["Jaimala", "Saptapadi", "Kanyadaan", "Mangalsutra"],
+          answer: "Jaimala"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दूल्हा-दुल्हन द्वारा पुष्पमाला के आदान-प्रदान को कौन सा संस्कार कहा जाता है?",
+          options: ["जयमाला", "सप्तपदी", "कन्यादान", "मंगलसूत्र"],
+          answer: "जयमाला"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన-దూల్హను మధ్య పుష్పాల మార్పిడిని ఏ ఆచారం అంటారు?",
+          options: ["జైమాలా", "సప్తపది", "కన్యాదానం", "మంగళసూత్రం"],
+          answer: "జైమాలా"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Ayurvedic text is renowned for its holistic approach, combining herbal remedies with lifestyle and diet recommendations?",
+          options: ["Ashtanga Hridayam", "Charaka Samhita", "Sushruta Samhita", "Sharira Sthana"],
+          answer: "Ashtanga Hridayam"
+        },
+        hi: {
+          question: "कौन सा शास्त्रीय आयुर्वेदिक ग्रन्थ अपनी समग्र पद्धति के लिए प्रसिद्ध है, जो जड़ी-बूटियों के उपचार के साथ जीवनशैली और आहार संबंधी सिफारिशों को भी सम्मिलित करता है?",
+          options: ["अष्टांग हृदयम", "चरक संहिता", "सुश्रुत संहिता", "शरीर स्थान"],
+          answer: "अष्टांग हृदयम"
+        },
+        te: {
+          question: "జడిబూటీలు, జీవనశైలి మరియు ఆహార సిఫారసులతో కూడిన సమగ్ర ఆరోగ్య పరిరక్షణకు సంబంధించిన ఏ శాస్త్రీయ ఆయుర్వేద గ్రంథం ప్రసిద్ధి చెందింది?",
+          options: ["అష్టాంగ హృదయం", "చరక సంహిత", "సుశ్రుత సంహిత", "శరీర స్థానం"],
+          answer: "అష్టాంగ హృదయం"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian scholar is known for his work 'Arthashastra', a treatise on statecraft, economic policy, and military strategy?",
+          options: ["Chanakya", "Kalidasa", "Panini", "Varahamihira"],
+          answer: "Chanakya"
+        },
+        hi: {
+          question: "कौन से प्राचीन भारतीय विद्वान को 'अर्थशास्त्र' लिखने के लिए जाना जाता है, जो राज्य कला, आर्थिक नीति और सैन्य रणनीति पर एक ग्रन्थ है?",
+          options: ["चाणक्य", "कालिदास", "पाणिनि", "वराहमिहिर"],
+          answer: "चाणक्य"
+        },
+        te: {
+          question: "రాజ్యనీతిని, ఆర్ధిక విధానాన్ని మరియు సైనిక వ్యూహాన్ని గురించి వివరించే 'అర్థశాస్త్రం' రచించిన పురాతన భారతీయ పండితుడు ఎవరు?",
+          options: ["చాణక్య", "కాలిదాస", "పాణిని", "వరాహమిహిర"],
+          answer: "చాణక్య"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Indian ritual involves the bride's feet being adorned with intricate henna designs?",
+          options: ["Mehendi", "Sindoor", "Mangalsutra", "Bindi"],
+          answer: "Mehendi"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दुल्हन के पैरों को जटिल मेंहदी डिजाइनों से सजाने वाली कौन सी रस्म शामिल होती है?",
+          options: ["मेंहदी", "सिंदूर", "मंगलसूत्र", "बिंदी"],
+          answer: "मेंहदी"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన్ పాదాలను సంక్లిష్టమైన మెహందీ డిజైన్లతో అలంకరించే ఆచారం ఏది?",
+          options: ["మెహందీ", "సిందూర్", "మంగళసూత్రం", "బిండి"],
+          answer: "మెహందీ"
+        }
+      },
+      {
+        en: {
+          question: "Which classical dance form from Odisha is known for its fluid movements and expressive gestures?",
+          options: ["Odissi", "Kathak", "Bharatanatyam", "Manipuri"],
+          answer: "Odissi"
+        },
+        hi: {
+          question: "ओडिशा राज्य से उत्पन्न, किस शास्त्रीय नृत्य रूप को इसकी लचीली गतियों और भावपूर्ण इशारों के लिए जाना जाता है?",
+          options: ["ओडिसी", "कथक", "भरतनाट्यम", "मणिपुरी"],
+          answer: "ओडिसी"
+        },
+        te: {
+          question: "ఒడిశా రాష్ట్రం నుండి ఉద్భవించిన, దాని సడలిన కదలికలు మరియు వ్యక్తీకరణాత్మక భావజాలాల కోసం ప్రసిద్ధి చెందిన నృత్య రూపం ఏది?",
+          options: ["ఒడిస్సీ", "కథక్", "భరతనాట్యం", "మణిపూరి"],
+          answer: "ఒడిస్సీ"
+        }
+      },
+      {
+        en: {
+          question: "Which style of Indian mural painting, often seen in Buddhist monasteries, is celebrated for its vivid storytelling and spiritual themes?",
+          options: ["Ajanta Caves Painting", "Rajasthani Fresco", "Mughal Miniature", "Dravidian Mural"],
+          answer: "Ajanta Caves Painting"
+        },
+        hi: {
+          question: "कौन सी भारतीय भित्ति चित्रकला शैली, जिसे बौद्ध मठों में देखा जाता है, अपनी जीवंत कथा और आध्यात्मिक विषयों के लिए प्रसिद्ध है?",
+          options: ["अजन्ता गुफा चित्रकला", "राजस्थानी फ्रेश्को", "मुगल लघु चित्रकला", "द्रविड़ भित्ति चित्र"],
+          answer: "अजन्ता गुफा चित्रकला"
+        },
+        te: {
+          question: "బౌద్ధ మఠాల్లో కనిపించే, తన ఉజ్వల కథా విశేషాలతో మరియు ఆధ్యాత్మిక అంశాలతో ప్రసిద్ధి పొందిన ఏ భారతీయ గోడపటం శైలి?",
+          options: ["అజంటా గుహల పెయింటింగ్", "రాజస్థానీ ఫ్రెస్కో", "ముగల్ సూక్ష్మచిత్రం", "ద్రవిడ మురల్"],
+          answer: "అజంటా గుహల పెయింటింగ్"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Sanskrit play by Kalidasa is renowned for its poetic beauty and had a profound influence on Indian literature?",
+          options: ["Abhijnanasakuntalam", "Meghaduta", "Raghuvamsha", "Kumarasambhavam"],
+          answer: "Abhijnanasakuntalam"
+        },
+        hi: {
+          question: "कालिदास द्वारा लिखित कौन सा शास्त्रीय संस्कृत नाटक अपनी काव्यात्मक सुंदरता के लिए प्रसिद्ध है और भारतीय साहित्य पर गहरा प्रभाव डालता है?",
+          options: ["अभिज्ञानशकुंतलम्", "मेघदूत", "रघुवंश", "कुमारसम्भवम्"],
+          answer: "अभिज्ञानशकुंतलम्"
+        },
+        te: {
+          question: "కాలిదాస రచించిన, తన కావ్యసౌందర్యంతో ప్రసిద్ధి చెందిన మరియు భారతీయ సాహిత్యంపై గంభీర ప్రభావం చూపిన నాటకం ఏది?",
+          options: ["అభిజ్ఞానశకుంతలమ్", "మెఘదూత", "రఘువంశం", "కుమారసంభవం"],
+          answer: "అభిజ్ఞానశకుంతలమ్"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Rajasthani folk dance is famous for its swirling movements and vibrant costumes?",
+          options: ["Ghoomar", "Kalbeliya", "Bhangra", "Garba"],
+          answer: "Ghoomar"
+        },
+        hi: {
+          question: "राजस्थान के किस पारंपरिक लोक नृत्य को इसके घूमते हुए कदमों और रंगीन पोशाकों के लिए जाना जाता है?",
+          options: ["घूमर", "कालबेलिया", "भांगड़ा", "गरबा"],
+          answer: "घूमर"
+        },
+        te: {
+          question: "రాజస్థాన్‌కు చెందిన, రంగుల వేషధారణతో మరియు తిలకుల కదలికలతో ప్రసిద్ధి పొందిన ఏ సంప్రదాయ జానపద నృత్యం?",
+          options: ["ఘూమార్", "కాల్బేలియా", "భాంగ్రా", "గర్బా"],
+          answer: "ఘూమార్"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian empire, with its capital at Pataliputra and famed for the teachings of Emperor Ashoka, laid the foundations for a centralized state?",
+          options: ["Maurya Empire", "Gupta Empire", "Chola Dynasty", "Mughal Empire"],
+          answer: "Maurya Empire"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय साम्राज्य, जिसकी राजधानी पाटलिपुत्र थी और जिसे सम्राट अशोक की शिक्षाओं के लिए जाना जाता है, एक केंद्रीकृत राज्य की नींव रखता है?",
+          options: ["मौर्य साम्राज्य", "गुप्त साम्राज्य", "चोल वंश", "मुगल साम्राज्य"],
+          answer: "मौर्य Empire"
+        },
+        te: {
+          question: "పాటాలిపుత్రంలో రాజధాని ఉన్న, సమ్రాట అశోక యొక్క బోధనలతో ప్రసిద్ధి పొందిన, కేంద్రబద్ధమైన రాష్ట్ర వ్యవస్థకు పునాది వేసిన ఏ పురాతన భారతీయ సామ్రాజ్యం?",
+          options: ["మౌర్య సామ్రాజ్యం", "గుప్త సామ్రాజ్యం", "చోల వంశం", "ముగల్ సామ్రాజ్యం"],
+          answer: "మౌర్య సామ్రాజ్యం"
+        }
+      },
+      {
+        en: {
+          question: "Which ritual in ancient Indian weddings involves the exchange of floral garlands between the bride and groom?",
+          options: ["Jaimala", "Saptapadi", "Kanyadaan", "Mangalsutra"],
+          answer: "Jaimala"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दूल्हा-दुल्हन द्वारा पुष्पमाला के आदान-प्रदान को कौन सा संस्कार कहा जाता है?",
+          options: ["जयमाला", "सप्तपदी", "कन्यादान", "मंगलसूत्र"],
+          answer: "जयमाला"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన-దూల్హను మధ్య పుష్పాల మార్పిడిని ఏ ఆచారం అంటారు?",
+          options: ["జైమాలా", "సప్తపది", "కన్యాదానం", "మంగళసూత్రం"],
+          answer: "జైమాలా"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Ayurvedic text is renowned for its holistic approach, combining herbal remedies with lifestyle and diet recommendations?",
+          options: ["Ashtanga Hridayam", "Charaka Samhita", "Sushruta Samhita", "Sharira Sthana"],
+          answer: "Ashtanga Hridayam"
+        },
+        hi: {
+          question: "कौन सा शास्त्रीय आयुर्वेदिक ग्रन्थ अपनी समग्र पद्धति के लिए प्रसिद्ध है, जो जड़ी-बूटियों के उपचार के साथ जीवनशैली और आहार संबंधी सिफारिशों को भी सम्मिलित करता है?",
+          options: ["अष्टांग हृदयम", "चरक संहिता", "सुश्रुत संहिता", "शरीर स्थान"],
+          answer: "अष्टांग हृदयम"
+        },
+        te: {
+          question: "జడిబూటీలు, జీవనశైలి మరియు ఆహార సిఫారసులతో కూడిన సమగ్ర ఆరోగ్య పరిరక్షణకు సంబంధించిన ఏ శాస్త్రీయ ఆయుర్వేద గ్రంథం ప్రసిద్ధి చెందింది?",
+          options: ["అష్టాంగ హృదయం", "చరక సంహిత", "సుశ్రుత సంహిత", "శరీర స్థానం"],
+          answer: "అష్టాంగ హృదయం"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian scholar is known for his work 'Arthashastra', a treatise on statecraft, economic policy, and military strategy?",
+          options: ["Chanakya", "Kalidasa", "Panini", "Varahamihira"],
+          answer: "Chanakya"
+        },
+        hi: {
+          question: "कौन से प्राचीन भारतीय विद्वान को 'अर्थशास्त्र' लिखने के लिए जाना जाता है, जो राज्य कला, आर्थिक नीति और सैन्य रणनीति पर एक ग्रन्थ है?",
+          options: ["चाणक्य", "कालिदास", "पाणिनि", "वराहमिहिर"],
+          answer: "चाणक्य"
+        },
+        te: {
+          question: "రాజ్యనీతిని, ఆర్ధిక విధానాన్ని మరియు సైనిక వ్యూహాన్ని గురించి వివరించే 'అర్థశాస్త్రం' రచించిన పురాతన భారతీయ పండితుడు ఎవరు?",
+          options: ["చాణక్య", "కాలిదాస", "పాణిని", "వరాహమిహిర"],
+          answer: "చాణక్య"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Indian ritual involves the bride's feet being adorned with intricate henna designs?",
+          options: ["Mehendi", "Sindoor", "Mangalsutra", "Bindi"],
+          answer: "Mehendi"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दुल्हन के पैरों को जटिल मेंहदी डिजाइनों से सजाने वाली कौन सी रस्म शामिल होती है?",
+          options: ["मेंहदी", "सिंदूर", "मंगलसूत्र", "बिंदी"],
+          answer: "मेंहदी"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన్ పాదాలను సంక్లిష్టమైన మెహందీ డిజైన్లతో అలంకరించే ఆచారం ఏది?",
+          options: ["మెహందీ", "సిందూర్", "మంగళసూత్రం", "బిండి"],
+          answer: "మెహందీ"
+        }
+      },
+      {
+        en: {
+          question: "Which classical dance form from Odisha is known for its fluid movements and expressive gestures?",
+          options: ["Odissi", "Kathak", "Bharatanatyam", "Manipuri"],
+          answer: "Odissi"
+        },
+        hi: {
+          question: "ओडिशा राज्य से उत्पन्न, किस शास्त्रीय नृत्य रूप को इसकी लचीली गतियों और भावपूर्ण इशारों के लिए जाना जाता है?",
+          options: ["ओडिसी", "कथक", "भरतनाट्यम", "मणिपुरी"],
+          answer: "ओडissi"
+        },
+        te: {
+          question: "ఒడిశా రాష్ట్రం నుండి ఉద్భవించిన, దాని సడలిన కదలికలు మరియు వ్యక్తీకరణాత్మక భావజాలాల కోసం ప్రసిద్ధి చెందిన నృత్య రూపం ఏది?",
+          options: ["ఒడిస్సీ", "కథక్", "భరతనాట్యం", "మణిపూరి"],
+          answer: "ఒడిస్సీ"
+        }
+      },
+      {
+        en: {
+          question: "Which style of Indian mural painting, often seen in Buddhist monasteries, is celebrated for its vivid storytelling and spiritual themes?",
+          options: ["Ajanta Caves Painting", "Rajasthani Fresco", "Mughal Miniature", "Dravidian Mural"],
+          answer: "Ajanta Caves Painting"
+        },
+        hi: {
+          question: "कौन सी भारतीय भित्ति चित्रकला शैली, जिसे बौद्ध मठों में देखा जाता है, अपनी जीवंत कथा और आध्यात्मिक विषयों के लिए प्रसिद्ध है?",
+          options: ["अजन्ता गुफा चित्रकला", "राजस्थानी फ्रेश्को", "मुगल लघु चित्रकला", "द्रविड़ भित्ति चित्र"],
+          answer: "अजन्ता गुफा चित्रकला"
+        },
+        te: {
+          question: "బౌద్ధ మఠాల్లో కనిపించే, తన ఉజ్వల కథా విశేషాలతో మరియు ఆధ్యాత్మిక అంశాలతో ప్రసిద్ధి పొందిన ఏ భారతీయ గోడపటం శైలి?",
+          options: ["అజంటా గుహల పెయింటింగ్", "రాజస్థానీ ఫ్రెస్కో", "ముగల్ సూక్ష్మచిత్రం", "ద్రవిడ మురల్"],
+          answer: "అజంటా గుహల పెయింటింగ్"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Sanskrit play by Kalidasa is renowned for its poetic beauty and had a profound influence on Indian literature?",
+          options: ["Abhijnanasakuntalam", "Meghaduta", "Raghuvamsha", "Kumarasambhavam"],
+          answer: "Abhijnanasakuntalam"
+        },
+        hi: {
+          question: "कालिदास द्वारा लिखित कौन सा शास्त्रीय संस्कृत नाटक अपनी काव्यात्मक सुंदरता के लिए प्रसिद्ध है और भारतीय साहित्य पर गहरा प्रभाव डालता है?",
+          options: ["अभिज्ञानशकुंतलम्", "मेघदूत", "रघुवंश", "कुमारसम्भवम्"],
+          answer: "अभिज्ञानशकुंतलम्"
+        },
+        te: {
+          question: "కాలిదాస రచించిన, తన కావ్యసౌందర్యంతో ప్రసిద్ధి చెందిన మరియు భారతీయ సాహిత్యంపై గంభీర ప్రభావం చూపిన నాటకం ఏది?",
+          options: ["అభిజ్ఞానశకుంతలమ్", "మెఘదూత", "రఘువంశం", "కుమారసంభవం"],
+          answer: "అభిజ్ఞానశకుంతలమ్"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Rajasthani folk dance is famous for its swirling movements and vibrant costumes?",
+          options: ["Ghoomar", "Kalbeliya", "Bhangra", "Garba"],
+          answer: "Ghoomar"
+        },
+        hi: {
+          question: "राजस्थान के किस पारंपरिक लोक नृत्य को इसके घूमते हुए कदमों और रंगीन पोशाकों के लिए जाना जाता है?",
+          options: ["घूमर", "कालबेलिया", "भांगड़ा", "गरबा"],
+          answer: "घूमर"
+        },
+        te: {
+          question: "రాజస్థాన్‌కు చెందిన, రంగుల వేషధారణతో మరియు తిలకుల కదలికలతో ప్రసిద్ధి పొందిన ఏ సంప్రదాయ జానపద నృత్యం?",
+          options: ["ఘూమార్", "కాల్బేలియా", "భాంగ్రా", "గర్బా"],
+          answer: "ఘూమార్"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian empire, with its capital at Pataliputra and famed for the teachings of Emperor Ashoka, laid the foundations for a centralized state?",
+          options: ["Maurya Empire", "Gupta Empire", "Chola Dynasty", "Mughal Empire"],
+          answer: "Maurya Empire"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय साम्राज्य, जिसकी राजधानी पाटलिपुत्र थी और जिसे सम्राट अशोक की शिक्षाओं के लिए जाना जाता है, एक केंद्रीकृत राज्य की नींव रखता है?",
+          options: ["मौर्य साम्राज्य", "गुप्त साम्राज्य", "चोल वंश", "मुगल साम्राज्य"],
+          answer: "मौर्य Empire"
+        },
+        te: {
+          question: "పాటాలిపుత్రంలో రాజధాని ఉన్న, సమ్రాట అశోక యొక్క బోధనలతో ప్రసిద్ధి పొందిన, కేంద్రబద్ధమైన రాష్ట్ర వ్యవస్థకు పునాది వేసిన ఏ పురాతన భారతీయ సామ్రాజ్యం?",
+          options: ["మౌర్య సామ్రాజ్యం", "గుప్త సామ్రాజ్యం", "చోల వంశం", "ముగల్ సామ్రాజ్యం"],
+          answer: "మౌర్య సామ్రాజ్యం"
+        }
+      },
+      {
+        en: {
+          question: "Which ritual in ancient Indian weddings involves the exchange of floral garlands between the bride and groom?",
+          options: ["Jaimala", "Saptapadi", "Kanyadaan", "Mangalsutra"],
+          answer: "Jaimala"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दूल्हा-दुल्हन द्वारा पुष्पमाला के आदान-प्रदान को कौन सा संस्कार कहा जाता है?",
+          options: ["जयमाला", "सप्तपदी", "कन्यादान", "मंगलसूत्र"],
+          answer: "जयमाला"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన-దూల్హను మధ్య పుష్పాల మార్పిడిని ఏ ఆచారం అంటారు?",
+          options: ["జైమాలా", "సప్తపది", "కన్యాదానం", "మంగళసూత్రం"],
+          answer: "జైమాలా"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Ayurvedic text is renowned for its holistic approach, combining herbal remedies with lifestyle and diet recommendations?",
+          options: ["Ashtanga Hridayam", "Charaka Samhita", "Sushruta Samhita", "Sharira Sthana"],
+          answer: "Ashtanga Hridayam"
+        },
+        hi: {
+          question: "कौन सा शास्त्रीय आयुर्वेदिक ग्रन्थ अपनी समग्र पद्धति के लिए प्रसिद्ध है, जो जड़ी-बूटियों के उपचार के साथ जीवनशैली और आहार संबंधी सिफारिशों को भी सम्मिलित करता है?",
+          options: ["अष्टांग हृदयम", "चरक संहिता", "सुश्रुत संहिता", "शरीर स्थान"],
+          answer: "अष्टांग हृदयम"
+        },
+        te: {
+          question: "జడిబూటీలు, జీవనశైలి మరియు ఆహార సిఫారసులతో కూడిన సమగ్ర ఆరోగ్య పరిరక్షణకు సంబంధించిన ఏ శాస్త్రీయ ఆయుర్వేద గ్రంథం ప్రసిద్ధి చెందింది?",
+          options: ["అష్టాంగ హృదయం", "చరక సంహిత", "సుశ్రుత సంహిత", "శరీర స్థానం"],
+          answer: "అష్టాంగ హృదయం"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian scholar is known for his work 'Arthashastra', a treatise on statecraft, economic policy, and military strategy?",
+          options: ["Chanakya", "Kalidasa", "Panini", "Varahamihira"],
+          answer: "Chanakya"
+        },
+        hi: {
+          question: "कौन से प्राचीन भारतीय विद्वान को 'अर्थशास्त्र' लिखने के लिए जाना जाता है, जो राज्य कला, आर्थिक नीति और सैन्य रणनीति पर एक ग्रन्थ है?",
+          options: ["चाणक्य", "कालिदास", "पाणिनि", "वराहमिहिर"],
+          answer: "चाणक्य"
+        },
+        te: {
+          question: "రాజ్యనీతిని, ఆర్ధిక విధానాన్ని మరియు సైనిక వ్యూహాన్ని గురించి వివరించే 'అర్థశాస్త్రం' రచించిన పురాతన భారతీయ పండితుడు ఎవరు?",
+          options: ["చాణక్య", "కాలిదాస", "పాణిని", "వరాహమిహిర"],
+          answer: "చాణక్య"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Indian ritual involves the bride's feet being adorned with intricate henna designs?",
+          options: ["Mehendi", "Sindoor", "Mangalsutra", "Bindi"],
+          answer: "Mehendi"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दुल्हन के पैरों को जटिल मेंहदी डिजाइनों से सजाने वाली कौन सी रस्म शामिल होती है?",
+          options: ["मेंहदी", "सिंदूर", "मंगलसूत्र", "बिंदी"],
+          answer: "मेंहदी"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన్ పాదాలను సంక్లిష్టమైన మెహందీ డిజైన్లతో అలంకరించే ఆచారం ఏది?",
+          options: ["మెహందీ", "సిందూర్", "మంగళసూత్రం", "బిండి"],
+          answer: "మెహందీ"
+        }
+      },
+      {
+        en: {
+          question: "Which classical dance form from Odisha is known for its fluid movements and expressive gestures?",
+          options: ["Odissi", "Kathak", "Bharatanatyam", "Manipuri"],
+          answer: "Odissi"
+        },
+        hi: {
+          question: "ओडिशा राज्य से उत्पन्न, किस शास्त्रीय नृत्य रूप को इसकी लचीली गतियों और भावपूर्ण इशारों के लिए जाना जाता है?",
+          options: ["ओडिसी", "कथक", "भरतनाट्यम", "मणिपुरी"],
+          answer: "ओडिसी"
+        },
+        te: {
+          question: "ఒడిశా రాష్ట్రం నుండి ఉద్భవించిన, దాని సడలిన కదలికలు మరియు వ్యక్తీకరణాత్మక భావజాలాల కోసం ప్రసిద్ధి చెందిన నృత్య రూపం ఏది?",
+          options: ["ఒడిస్సీ", "కథక్", "భరతనాట్యం", "మణిపూరి"],
+          answer: "ఒడిస్సీ"
+        }
+      },
+      {
+        en: {
+          question: "Which style of Indian mural painting, often seen in Buddhist monasteries, is celebrated for its vivid storytelling and spiritual themes?",
+          options: ["Ajanta Caves Painting", "Rajasthani Fresco", "Mughal Miniature", "Dravidian Mural"],
+          answer: "Ajanta Caves Painting"
+        },
+        hi: {
+          question: "कौन सी भारतीय भित्ति चित्रकला शैली, जिसे बौद्ध मठों में देखा जाता है, अपनी जीवंत कथा और आध्यात्मिक विषयों के लिए प्रसिद्ध है?",
+          options: ["अजन्ता गुफा चित्रकला", "राजस्थानी फ्रेश्को", "मुगल लघु चित्रकला", "द्रविड़ भित्ति चित्र"],
+          answer: "अजन्ता गुफा चित्रकला"
+        },
+        te: {
+          question: "బౌద్ధ మఠాల్లో కనిపించే, తన ఉజ్వల కథా విశేషాలతో మరియు ఆధ్యాత్మిక అంశాలతో ప్రసిద్ధి పొందిన ఏ భారతీయ గోడపటం శైలి?",
+          options: ["అజంటా గుహల పెయింటింగ్", "రాజస్థానీ ఫ్రెస్కో", "ముగల్ సూక్ష్మచిత్రం", "ద్రవిడ మురల్"],
+          answer: "అజంటా గుహల పెయింటింగ్"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Sanskrit play by Kalidasa is renowned for its poetic beauty and had a profound influence on Indian literature?",
+          options: ["Abhijnanasakuntalam", "Meghaduta", "Raghuvamsha", "Kumarasambhavam"],
+          answer: "Abhijnanasakuntalam"
+        },
+        hi: {
+          question: "कालिदास द्वारा लिखित कौन सा शास्त्रीय संस्कृत नाटक अपनी काव्यात्मक सुंदरता के लिए प्रसिद्ध है और भारतीय साहित्य पर गहरा प्रभाव डालता है?",
+          options: ["अभिज्ञानशकुंतलम्", "मेघदूत", "रघुवंश", "कुमारसम्भवम्"],
+          answer: "अभिज्ञानशकुंतलम्"
+        },
+        te: {
+          question: "కాలిదాస రచించిన, తన కావ్యసౌందర్యంతో ప్రసిద్ధి చెందిన మరియు భారతీయ సాహిత్యంపై గంభీర ప్రభావం చూపిన నాటకం ఏది?",
+          options: ["అభిజ్ఞానశకుంతలమ్", "మెఘదూత", "రఘువంశం", "కుమారసంభవం"],
+          answer: "అభిజ్ఞానశకుంతలమ్"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Rajasthani folk dance is famous for its swirling movements and vibrant costumes?",
+          options: ["Ghoomar", "Kalbeliya", "Bhangra", "Garba"],
+          answer: "Ghoomar"
+        },
+        hi: {
+          question: "राजस्थान के किस पारंपरिक लोक नृत्य को इसके घूमते हुए कदमों और रंगीन पोशाकों के लिए जाना जाता है?",
+          options: ["घूमर", "कालबेलिया", "भांगड़ा", "गरबा"],
+          answer: "घूमर"
+        },
+        te: {
+          question: "రాజస్థాన్‌కు చెందిన, రంగుల వేషధారణతో మరియు తిలకుల కదలికలతో ప్రసిద్ధి పొందిన ఏ సంప్రదాయ జానపద నృత్యం?",
+          options: ["ఘూమార్", "కాల్బేలియా", "భాంగ్రా", "గర్బా"],
+          answer: "ఘూమార్"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian empire, with its capital at Pataliputra and famed for the teachings of Emperor Ashoka, laid the foundations for a centralized state?",
+          options: ["Maurya Empire", "Gupta Empire", "Chola Dynasty", "Mughal Empire"],
+          answer: "Maurya Empire"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय साम्राज्य, जिसकी राजधानी पाटलिपुत्र थी और जिसे सम्राट अशोक की शिक्षाओं के लिए जाना जाता है, एक केंद्रीकृत राज्य की नींव रखता है?",
+          options: ["मौर्य साम्राज्य", "गुप्त साम्राज्य", "चोल वंश", "मुगल साम्राज्य"],
+          answer: "मौरya Empire"
+        },
+        te: {
+          question: "పాటాలిపుత్రంలో రాజధాని ఉన్న, సమ్రాట అశోక యొక్క బోధనలతో ప్రసిద్ధి పొందిన, కేంద్రబద్ధమైన రాష్ట్ర వ్యవస్థకు పునాది వేసిన ఏ పురాతన భారతీయ సామ్రాజ్యం?",
+          options: ["మౌర్య సామ్రాజ్యం", "గుప్త సామ్రాజ్యం", "చోల వంశం", "ముగల్ సామ్రాజ్యం"],
+          answer: "మౌర్య సామ్రాజ్యం"
+        }
+      },
+      {
+        en: {
+          question: "Which ritual in ancient Indian weddings involves the exchange of floral garlands between the bride and groom?",
+          options: ["Jaimala", "Saptapadi", "Kanyadaan", "Mangalsutra"],
+          answer: "Jaimala"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दूल्हा-दुल्हन द्वारा पुष्पमाला के आदान-प्रदान को कौन सा संस्कार कहा जाता है?",
+          options: ["जयमाला", "सप्तपदी", "कन्यादान", "मंगलसूत्र"],
+          answer: "जयमाला"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన-దూల్హను మధ్య పుష్పాల మార్పిడిని ఏ ఆచారం అంటారు?",
+          options: ["జైమాలా", "సప్తపది", "కన్యాదానం", "మంగళసూత్రం"],
+          answer: "జైమాలా"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Ayurvedic text is renowned for its holistic approach, combining herbal remedies with lifestyle and diet recommendations?",
+          options: ["Ashtanga Hridayam", "Charaka Samhita", "Sushruta Samhita", "Sharira Sthana"],
+          answer: "Ashtanga Hridayam"
+        },
+        hi: {
+          question: "कौन सा शास्त्रीय आयुर्वेदिक ग्रन्थ अपनी समग्र पद्धति के लिए प्रसिद्ध है, जो जड़ी-बूटियों के उपचार के साथ जीवनशैली और आहार संबंधी सिफारिशों को भी सम्मिलित करता है?",
+          options: ["अष्टांग हृदयम", "चरक संहिता", "सुश्रुत संहिता", "शरीर स्थान"],
+          answer: "अष्टांग हृदयम"
+        },
+        te: {
+          question: "జడిబూటీలు, జీవనశైలి మరియు ఆహార సిఫారసులతో కూడిన సమగ్ర ఆరోగ్య పరిరక్షణకు సంబంధించిన ఏ శాస్త్రీయ ఆయుర్వేద గ్రంథం ప్రసిద్ధి చెందింది?",
+          options: ["అష్టాంగ హృదయం", "చరక సంహిత", "సుశ్రుత సంహిత", "శరీర స్థానం"],
+          answer: "అష్టాంగ హృదయం"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian scholar is known for his work 'Arthashastra', a treatise on statecraft, economic policy, and military strategy?",
+          options: ["Chanakya", "Kalidasa", "Panini", "Varahamihira"],
+          answer: "Chanakya"
+        },
+        hi: {
+          question: "कौन से प्राचीन भारतीय विद्वान को 'अर्थशास्त्र' लिखने के लिए जाना जाता है, जो राज्य कला, आर्थिक नीति और सैन्य रणनीति पर एक ग्रन्थ है?",
+          options: ["चाणक्य", "कालिदास", "पाणिनि", "वराहमिहिर"],
+          answer: "चाणक्य"
+        },
+        te: {
+          question: "రాజ్యనీతిని, ఆర్ధిక విధానాన్ని మరియు సైనిక వ్యూహాన్ని గురించి వివరించే 'అర్థశాస్త్రం' రచించిన పురాతన భారతీయ పండితుడు ఎవరు?",
+          options: ["చాణక్య", "కాలిదాస", "పాణిని", "వరాహమిహిర"],
+          answer: "చాణక్య"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Indian ritual involves the bride's feet being adorned with intricate henna designs?",
+          options: ["Mehendi", "Sindoor", "Mangalsutra", "Bindi"],
+          answer: "Mehendi"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दुल्हन के पैरों को जटिल मेंहदी डिजाइनों से सजाने वाली कौन सी रस्म शामिल होती है?",
+          options: ["मेंहदी", "सिंदूर", "मंगलसूत्र", "बिंदी"],
+          answer: "मेंहदी"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన్ పాదాలను సంక్లిష్టమైన మెహందీ డిజైన్లతో అలంకరించే ఆచారం ఏది?",
+          options: ["మెహందీ", "సిందూర్", "మంగళసూత్రం", "బిండి"],
+          answer: "మెహందీ"
+        }
+      },
+      {
+        en: {
+          question: "Which classical dance form from Odisha is known for its fluid movements and expressive gestures?",
+          options: ["Odissi", "Kathak", "Bharatanatyam", "Manipuri"],
+          answer: "Odissi"
+        },
+        hi: {
+          question: "ओडिशा राज्य से उत्पन्न, किस शास्त्रीय नृत्य रूप को इसकी लचीली गतियों और भावपूर्ण इशारों के लिए जाना जाता है?",
+          options: ["ओडिसी", "कथक", "भरतनाट्यम", "मणिपुरी"],
+          answer: "ओडissi"
+        },
+        te: {
+          question: "ఒడిశా రాష్ట్రం నుండి ఉద్భవించిన, దాని సడలిన కదలికలు మరియు వ్యక్తీకరణాత్మక భావజాలాల కోసం ప్రసిద్ధి చెందిన నృత్య రూపం ఏది?",
+          options: ["ఒడిస్సీ", "కథక్", "భరతనాట్యం", "మణిపూరి"],
+          answer: "ఒడిస్సీ"
+        }
+      },
+      {
+        en: {
+          question: "Which style of Indian mural painting, often seen in Buddhist monasteries, is celebrated for its vivid storytelling and spiritual themes?",
+          options: ["Ajanta Caves Painting", "Rajasthani Fresco", "Mughal Miniature", "Dravidian Mural"],
+          answer: "Ajanta Caves Painting"
+        },
+        hi: {
+          question: "कौन सी भारतीय भित्ति चित्रकला शैली, जिसे बौद्ध मठों में देखा जाता है, अपनी जीवंत कथा और आध्यात्मिक विषयों के लिए प्रसिद्ध है?",
+          options: ["अजन्ता गुफा चित्रकला", "राजस्थानी फ्रेश्को", "मुगल लघु चित्रकला", "द्रविड़ भित्ति चित्र"],
+          answer: "अजन्ता गुफा चित्रकला"
+        },
+        te: {
+          question: "బౌద్ధ మఠాల్లో కనిపించే, తన ఉజ్వల కథా విశేషాలతో మరియు ఆధ్యాత్మిక అంశాలతో ప్రసిద్ధి పొందిన ఏ భారతీయ గోడపటం శైలి?",
+          options: ["అజంటా గుహల పెయింటింగ్", "రాజస్థానీ ఫ్రెస్కో", "ముగల్ సూక్ష్మచిత్రం", "ద్రవిడ మురల్"],
+          answer: "అజంటా గుహల పెయింటింగ్"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Sanskrit play by Kalidasa is renowned for its poetic beauty and had a profound influence on Indian literature?",
+          options: ["Abhijnanasakuntalam", "Meghaduta", "Raghuvamsha", "Kumarasambhavam"],
+          answer: "Abhijnanasakuntalam"
+        },
+        hi: {
+          question: "कालिदास द्वारा लिखित कौन सा शास्त्रीय संस्कृत नाटक अपनी काव्यात्मक सुंदरता के लिए प्रसिद्ध है और भारतीय साहित्य पर गहरा प्रभाव डालता है?",
+          options: ["अभिज्ञानशकुंतलम्", "मेघदूत", "रघुवंश", "कुमारसम्भवम्"],
+          answer: "अभिज्ञानशकुंतलम्"
+        },
+        te: {
+          question: "కాలిదాస రచించిన, తన కావ్యసౌందర్యంతో ప్రసిద్ధి చెందిన మరియు భారతీయ సాహిత్యంపై గంభీర ప్రభావం చూపిన నాటకం ఏది?",
+          options: ["అభిజ్ఞానశకుంతలమ్", "మెఘదూత", "రఘువంశం", "కుమారసంభవం"],
+          answer: "అభిజ్ఞానశకుంతలమ్"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Rajasthani folk dance is famous for its swirling movements and vibrant costumes?",
+          options: ["Ghoomar", "Kalbeliya", "Bhangra", "Garba"],
+          answer: "Ghoomar"
+        },
+        hi: {
+          question: "राजस्थान के किस पारंपरिक लोक नृत्य को इसके घूमते हुए कदमों और रंगीन पोशाकों के लिए जाना जाता है?",
+          options: ["घूमर", "कालबेलिया", "भांगड़ा", "गरबा"],
+          answer: "घूमर"
+        },
+        te: {
+          question: "రాజస్థాన్‌కు చెందిన, రంగుల వేషధారణతో మరియు తిలకుల కదలికలతో ప్రసిద్ధి పొందిన ఏ సంప్రదాయ జానపద నృత్యం?",
+          options: ["ఘూమార్", "కాల్బేలియా", "భాంగ్రా", "గర్బా"],
+          answer: "ఘూమార్"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian empire, with its capital at Pataliputra and famed for the teachings of Emperor Ashoka, laid the foundations for a centralized state?",
+          options: ["Maurya Empire", "Gupta Empire", "Chola Dynasty", "Mughal Empire"],
+          answer: "Maurya Empire"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय साम्राज्य, जिसकी राजधानी पाटलिपुत्र थी और जिसे सम्राट अशोक की शिक्षाओं के लिए जाना जाता है, एक केंद्रीकृत राज्य की नींव रखता है?",
+          options: ["मौर्य साम्राज्य", "गुप्त साम्राज्य", "चोल वंश", "मुगल साम्राज्य"],
+          answer: "मौरya Empire"
+        },
+        te: {
+          question: "పాటాలిపుత్రంలో రాజధాని ఉన్న, సమ్రాట అశోక యొక్క బోధనలతో ప్రసిద్ధి పొందిన, కేంద్రబద్ధమైన రాష్ట్ర వ్యవస్థకు పునాది వేసిన ఏ పురాతన భారతీయ సామ్రాజ్యం?",
+          options: ["మౌర్య సామ్రాజ్యం", "గుప్త సామ్రాజ్యం", "చోల వంశం", "ముగల్ సామ్రాజ్యం"],
+          answer: "మౌర్య సామ్రాజ్యం"
+        }
+      },
+      {
+        en: {
+          question: "Which ritual in ancient Indian weddings involves the exchange of floral garlands between the bride and groom?",
+          options: ["Jaimala", "Saptapadi", "Kanyadaan", "Mangalsutra"],
+          answer: "Jaimala"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दूल्हा-दुल्हन द्वारा पुष्पमाला के आदान-प्रदान को कौन सा संस्कार कहा जाता है?",
+          options: ["जयमाला", "सप्तपदी", "कन्यादान", "मंगलसूत्र"],
+          answer: "जयमाला"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన-దూల్హను మధ్య పుష్పాల మార్పిడిని ఏ ఆచారం అంటారు?",
+          options: ["జైమాలా", "సప్తపది", "కన్యాదానం", "మంగళసూత్రం"],
+          answer: "జైమాలా"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Ayurvedic text is renowned for its holistic approach, combining herbal remedies with lifestyle and diet recommendations?",
+          options: ["Ashtanga Hridayam", "Charaka Samhita", "Sushruta Samhita", "Sharira Sthana"],
+          answer: "Ashtanga Hridayam"
+        },
+        hi: {
+          question: "कौन सा शास्त्रीय आयुर्वेदिक ग्रन्थ अपनी समग्र पद्धति के लिए प्रसिद्ध है, जो जड़ी-बूटियों के उपचार के साथ जीवनशैली और आहार संबंधी सिफारिशों को भी सम्मिलित करता है?",
+          options: ["अष्टांग हृदयम", "चरक संहिता", "सुश्रुत संहिता", "शरीर स्थान"],
+          answer: "अष्टांग हृदयम"
+        },
+        te: {
+          question: "జడిబూటీలు, జీవనశైలి మరియు ఆహార సిఫారసులతో కూడిన సమగ్ర ఆరోగ్య పరిరక్షణకు సంబంధించిన ఏ శాస్త్రీయ ఆయుర్వేద గ్రంథం ప్రసిద్ధి చెందింది?",
+          options: ["అష్టాంగ హృదయం", "చరక సంహిత", "సుశ్రుత సంహిత", "శరీర స్థానం"],
+          answer: "అష్టాంగ హృదయం"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian scholar is known for his work 'Arthashastra', a treatise on statecraft, economic policy, and military strategy?",
+          options: ["Chanakya", "Kalidasa", "Panini", "Varahamihira"],
+          answer: "Chanakya"
+        },
+        hi: {
+          question: "कौन से प्राचीन भारतीय विद्वान को 'अर्थशास्त्र' लिखने के लिए जाना जाता है, जो राज्य कला, आर्थिक नीति और सैन्य रणनीति पर एक ग्रन्थ है?",
+          options: ["चाणक्य", "कालिदास", "पाणिनि", "वराहमिहिर"],
+          answer: "चाणक्य"
+        },
+        te: {
+          question: "రాజ్యనీతిని, ఆర్ధిక విధానాన్ని మరియు సైనిక వ్యూహాన్ని గురించి వివరించే 'అర్థశాస్త్రం' రచించిన పురాతన భారతీయ పండితుడు ఎవరు?",
+          options: ["చాణక్య", "కాలిదాస", "పాణిని", "వరాహమిహిర"],
+          answer: "చాణక్య"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Indian ritual involves the bride's feet being adorned with intricate henna designs?",
+          options: ["Mehendi", "Sindoor", "Mangalsutra", "Bindi"],
+          answer: "Mehendi"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दुल्हन के पैरों को जटिल मेंहदी डिजाइनों से सजाने वाली कौन सी रस्म शामिल होती है?",
+          options: ["मेंहदी", "सिंदूर", "मंगलसूत्र", "बिंदी"],
+          answer: "मेंहदी"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన్ పాదాలను సంక్లిష్టమైన మెహందీ డిజైన్లతో అలంకరించే ఆచారం ఏది?",
+          options: ["మెహందీ", "సిందూర్", "మంగళసూత్రం", "బిండి"],
+          answer: "మెహందీ"
+        }
+      },
+      {
+        en: {
+          question: "Which classical dance form from Odisha is known for its fluid movements and expressive gestures?",
+          options: ["Odissi", "Kathak", "Bharatanatyam", "Manipuri"],
+          answer: "Odissi"
+        },
+        hi: {
+          question: "ओडिशा राज्य से उत्पन्न, किस शास्त्रीय नृत्य रूप को इसकी लचीली गतियों और भावपूर्ण इशारों के लिए जाना जाता है?",
+          options: ["ओडिसी", "कथक", "भरतनाट्यम", "मणिपुरी"],
+          answer: "ओडissi"
+        },
+        te: {
+          question: "ఒడిశా రాష్ట్రం నుండి ఉద్భవించిన, దాని సడలిన కదలికలు మరియు వ్యక్తీకరణాత్మక భావజాలాల కోసం ప్రసిద్ధి చెందిన నృత్య రూపం ఏది?",
+          options: ["ఒడిస్సీ", "కథక్", "భరతనాట్యం", "మణిపూరి"],
+          answer: "ఒడిస్సీ"
+        }
+      },
+      {
+        en: {
+          question: "Which style of Indian mural painting, often seen in Buddhist monasteries, is celebrated for its vivid storytelling and spiritual themes?",
+          options: ["Ajanta Caves Painting", "Rajasthani Fresco", "Mughal Miniature", "Dravidian Mural"],
+          answer: "Ajanta Caves Painting"
+        },
+        hi: {
+          question: "कौन सी भारतीय भित्ति चित्रकला शैली, जिसे बौद्ध मठों में देखा जाता है, अपनी जीवंत कथा और आध्यात्मिक विषयों के लिए प्रसिद्ध है?",
+          options: ["अजन्ता गुफा चित्रकला", "राजस्थानी फ्रेश्को", "मुगल लघु चित्रकला", "द्रविड़ भित्ति चित्र"],
+          answer: "अजन्ता गुफा चित्रकला"
+        },
+        te: {
+          question: "బౌద్ధ మఠాల్లో కనిపించే, తన ఉజ్వల కథా విశేషాలతో మరియు ఆధ్యాత్మిక అంశాలతో ప్రసిద్ధి పొందిన ఏ భారతీయ గోడపటం శైలి?",
+          options: ["అజంటా గుహల పెయింటింగ్", "రాజస్థానీ ఫ్రెస్కో", "ముగల్ సూక్ష్మచిత్రం", "ద్రవిడ మురల్"],
+          answer: "అజంటా గుహల పెయింటింగ్"
+        }
+      },
+      {
+        en: {
+          question: "Which classical Sanskrit play by Kalidasa is renowned for its poetic beauty and had a profound influence on Indian literature?",
+          options: ["Abhijnanasakuntalam", "Meghaduta", "Raghuvamsha", "Kumarasambhavam"],
+          answer: "Abhijnanasakuntalam"
+        },
+        hi: {
+          question: "कालिदास द्वारा लिखित कौन सा शास्त्रीय संस्कृत नाटक अपनी काव्यात्मक सुंदरता के लिए प्रसिद्ध है और भारतीय साहित्य पर गहरा प्रभाव डालता है?",
+          options: ["अभिज्ञानशकुंतलम्", "मेघदूत", "रघुवंश", "कुमारसम्भवम्"],
+          answer: "अभिज्ञानशकुंतलम्"
+        },
+        te: {
+          question: "కాలిదాస రచించిన, తన కావ్యసౌందర్యంతో ప్రసిద్ధి చెందిన మరియు భారతీయ సాహిత్యంపై గంభీర ప్రభావం చూపిన నాటకం ఏది?",
+          options: ["అభిజ్ఞానశకుంతలమ్", "మెఘదూత", "రఘువంశం", "కుమారసంభవం"],
+          answer: "అభిజ్ఞానశకుంతలమ్"
+        }
+      },
+      {
+        en: {
+          question: "Which traditional Rajasthani folk dance is famous for its swirling movements and vibrant costumes?",
+          options: ["Ghoomar", "Kalbeliya", "Bhangra", "Garba"],
+          answer: "Ghoomar"
+        },
+        hi: {
+          question: "राजस्थान के किस पारंपरिक लोक नृत्य को इसके घूमते हुए कदमों और रंगीन पोशाकों के लिए जाना जाता है?",
+          options: ["घूमर", "कालबेलिया", "भांगड़ा", "गरबा"],
+          answer: "घूमर"
+        },
+        te: {
+          question: "రాజస్థాన్‌కు చెందిన, రంగుల వేషధారణతో మరియు తిలకుల కదలికలతో ప్రసిద్ధి పొందిన ఏ సంప్రదాయ జానపద నృత్యం?",
+          options: ["ఘూమార్", "కాల్బేలియా", "భాంగ్రా", "గర్బా"],
+          answer: "ఘూమార్"
+        }
+      },
+      {
+        en: {
+          question: "Which ancient Indian empire, with its capital at Pataliputra and famed for the teachings of Emperor Ashoka, laid the foundations for a centralized state?",
+          options: ["Maurya Empire", "Gupta Empire", "Chola Dynasty", "Mughal Empire"],
+          answer: "Maurya Empire"
+        },
+        hi: {
+          question: "कौन सा प्राचीन भारतीय साम्राज्य, जिसकी राजधानी पाटलिपुत्र थी और जिसे सम्राट अशोक की शिक्षाओं के लिए जाना जाता है, एक केंद्रीकृत राज्य की नींव रखता है?",
+          options: ["मौर्य साम्राज्य", "गुप्त साम्राज्य", "चोल वंश", "मुगल साम्राज्य"],
+          answer: "मौरya Empire"
+        },
+        te: {
+          question: "పాటాలిపుత్రంలో రాజధాని ఉన్న, సమ్రాట అశోక యొక్క బోధనలతో ప్రసిద్ధి పొందిన, కేంద్రబద్ధమైన రాష్ట్ర వ్యవస్థకు పునాది వేసిన ఏ పురాతన భారతీయ సామ్రాజ్యం?",
+          options: ["మౌర్య సామ్రాజ్యం", "గుప్త సామ్రాజ్యం", "చోల వంశం", "ముగల్ సామ్రాజ్యం"],
+          answer: "మౌర్య సామ్రాజ్యం"
+        }
+      },
+      {
+        en: {
+          question: "Which ritual in ancient Indian weddings involves the exchange of floral garlands between the bride and groom?",
+          options: ["Jaimala", "Saptapadi", "Kanyadaan", "Mangalsutra"],
+          answer: "Jaimala"
+        },
+        hi: {
+          question: "हिंदू शादियों में, दूल्हा-दुल्हन द्वारा पुष्पमाला के आदान-प्रदान को कौन सा संस्कार कहा जाता है?",
+          options: ["जयमाला", "सप्तपदी", "कन्यादान", "मंगलसूत्र"],
+          answer: "जयमाला"
+        },
+        te: {
+          question: "హిందూ వివాహాల్లో, దూల్హన-దూల్హను మధ్య పుష్పాల మార్పిడిని ఏ ఆచారం అంటారు?",
+          options: ["జైమాలా", "సప్తపది", "కన్యాదానం", "మంగళసూత్రం"],
+          answer: "జైమాలా"
+        }
+      }
+    ];
+
+    // Global variables for user details and game state
+    let userName = "";
+    let userRelation = "";
+    let userLanguage = "en"; // default English
+    let currentQuestion = 0;
+    let score = 0;
+    // Global variable to store the randomly selected questions for the game
+    let randomizedQuestions = [];
+
+    // Fisher-Yates shuffle algorithm to randomize array elements
+    function shuffle(array) {
+      let currentIndex = array.length, temporaryValue, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+      return array;
+    }
+
+    // Save game result to localStorage
+    function saveGameResult() {
+      let gameResults = JSON.parse(localStorage.getItem("gameResults")) || [];
+      let currentTime = new Date().toISOString();
+      gameResults.push({ name: userName, score: score, time: currentTime });
+      localStorage.setItem("gameResults", JSON.stringify(gameResults));
+    }
+
+    // On form submission, store user details, update texts, and start the game
+    document.getElementById("userForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      userName = document.getElementById("userName").value;
+      userRelation = document.getElementById("userRelation").value;
+      userLanguage = document.getElementById("userLanguage").value;
+      updateStaticTexts();
+      startGame();
+    });
+
+    // Update static UI texts and rules based on selected language
+    function updateStaticTexts() {
+      const t = translations[userLanguage];
+      document.getElementById("startTitle").textContent = t.startTitle;
+      document.getElementById("startInstruction").textContent = t.startInstruction;
+      document.getElementById("nameLabel").textContent = t.nameLabel;
+      document.getElementById("relationLabel").textContent = t.relationLabel;
+      document.getElementById("languageLabel").textContent = t.languageLabel;
+      document.getElementById("startButton").textContent = t.startButton;
+      document.getElementById("rulesTitle").textContent = t.rulesTitle;
+      // Populate rules list
+      const rulesList = document.getElementById("rulesList");
+      rulesList.innerHTML = "";
+      t.rules.forEach(rule => {
+        let li = document.createElement("li");
+        li.textContent = rule;
+        rulesList.appendChild(li);
+      });
+    }
+
+    function startGame() {
+      document.getElementById("startScreen").classList.add("hidden");
+      document.getElementById("questionScreen").classList.remove("hidden");
+      const t = translations[userLanguage];
+      document.getElementById("welcomeMessage").textContent = t.welcome
+        .replace("{userName}", userName)
+        .replace("{userRelation}", userRelation);
+      // Randomize the entire pool and then select 15 questions for this game
+      randomizedQuestions = shuffle(localizedQuestions.slice()).slice(0, 15);
+      currentQuestion = 0;
+      score = 0;
+      displayQuestion();
+    }
+
+    function displayQuestion() {
+      document.getElementById("feedback").textContent = "";
+      const q = randomizedQuestions[currentQuestion][userLanguage];
+      document.getElementById("questionText").textContent = q.question;
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      let shuffledOptions = shuffle(q.options.slice());
+      shuffledOptions.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.className = "option";
+        btn.onclick = () => checkAnswer(option);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const q = randomizedQuestions[currentQuestion][userLanguage];
+      const t = translations[userLanguage];
+      if (selected === q.answer) {
+        score++;
+        document.getElementById("feedback").style.color = "green";
+        document.getElementById("feedback").textContent = t.correct;
+      } else {
+        document.getElementById("feedback").style.color = "red";
+        document.getElementById("feedback").textContent = t.wrong.replace("{answer}", q.answer);
+      }
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < randomizedQuestions.length) {
+          displayQuestion();
+        } else {
+          endGame();
+        }
+      }, 1500);
+    }
+
+    function endGame() {
+      document.getElementById("questionScreen").classList.add("hidden");
+      document.getElementById("finalScreen").classList.remove("hidden");
+      const t = translations[userLanguage];
+      document.getElementById("gameOverText").textContent = t.gameOver;
+      document.getElementById("scoreText").textContent = t.score.replace("{score}", score);
+      
+      // Save game result
+      saveGameResult();
+      
+      const resultDiv = document.getElementById("resultMessage");
+      const giftDiv = document.getElementById("giftSuggestions");
+      
+      if (score === randomizedQuestions.length) {
+        // Check if current perfect score is among the first 20 perfect scores
+        let gameResults = JSON.parse(localStorage.getItem("gameResults")) || [];
+        let perfectScores = gameResults.filter(r => r.score === randomizedQuestions.length);
+        if (perfectScores.length <= 20) {
+          resultDiv.innerHTML = `<h3>${t.giftCardUnlocked}</h3><p>${t.giftCardCode}</p>`;
+        } else {
+          resultDiv.innerHTML = `<h3>${t.correct}</h3><p>You achieved a perfect score but the surprise gift has already been claimed.</p>`;
+        }
+      } else {
+        resultDiv.innerHTML = `<h3>${t.giftSuggestionsTitle}</h3>`;
+        let listHtml = "<ul style='text-align: left;'>";
+        t.giftList.forEach(item => {
+          listHtml += `<li>${item}</li>`;
+        });
+        listHtml += "</ul>";
+        giftDiv.innerHTML = listHtml;
+      }
+    }
+
+    // Admin login functionality
+    function adminLogin() {
+      let password = prompt("Enter admin password:");
+      if(password === "admin123") {
+        displayAdminPanel();
+      } else {
+        alert("Incorrect password.");
+      }
+    }
+
+    function displayAdminPanel() {
+      const adminPanel = document.getElementById("adminPanel");
+      const adminContent = document.getElementById("adminContent");
+      let gameResults = JSON.parse(localStorage.getItem("gameResults")) || [];
+      if(gameResults.length === 0) {
+        adminContent.innerHTML = "<p>No game results available.</p>";
+      } else {
+        // Sort results by time (earliest first)
+        gameResults.sort((a, b) => new Date(a.time) - new Date(b.time));
+        let tableHtml = "<table><tr><th>Name</th><th>Score</th><th>Time</th></tr>";
+        gameResults.forEach(result => {
+          tableHtml += `<tr><td>${result.name}</td><td>${result.score}</td><td>${new Date(result.time).toLocaleString()}</td></tr>`;
+        });
+        tableHtml += "</table>";
+        adminContent.innerHTML = tableHtml;
+      }
+      adminPanel.classList.remove("hidden");
+    }
+    
+    // Initialize default static texts
+    updateStaticTexts();
+  </script>
+</body>
+</html>
